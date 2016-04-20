@@ -18,4 +18,4 @@ def test_name():
     assert parsedacl.name == name
     assert result['name'] == name
     assert parsedacl.name == result['name']
-    assert len(parsedacl.entries) == 8
+    assert len(parsedacl.entries) == len(showacltest.splitlines())-2

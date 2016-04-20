@@ -19,6 +19,7 @@ action = pp.oneOf('permit deny')
 testop = pp.oneOf('lt gt eq')
 ports = pp.Word(pp.alphanums+'-')
 protocol = pp.oneOf('ip tcp udp')
+rangeop = pp.Literal('range')
 ipoctet = pp.Word(pp.nums, max=3)
 cidrmask = pp.Word(pp.nums, max=2)
 ipaddr = pp.Combine(ipoctet + (dot + ipoctet) * 3, joinString='.')
@@ -48,8 +49,11 @@ condition = (protocol('protocol') +
             (anyip ^ hostip ^ net)('srcip') +
             (pp.Optional(testop('srcop') + srcport('srcports'))) +
             (anyip ^ hostip ^ net)('dstip') +
-            (pp.Optional(testop('dstop') + dstport('dstports')))
-            )
+                (
+                 (pp.Optional(testop('dstop') + dstport('dstports'))) ^
+                 (pp.Optional(rangeop('dstop') + ports + ports))
+                 )
+             )
 
 aclentry = (lineno('index') +
             action('action') +

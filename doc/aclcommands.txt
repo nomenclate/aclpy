@@ -1,0 +1,231 @@
+router(config-acl-test)#?
+  abort           Exit without committing pending changes
+  comment         Up to 240 characters, comment for this mode
+  default         Set a command to its defaults
+  deny            Specify packets to drop
+  exit            Exit from ACL Configuration mode
+  fragment-rules  Add fragment rules
+  help            Description of the interactive help system
+  no              Negate a command or set its defaults
+  permit          Specify packets to accept
+  remark          Specify a comment
+  resequence      Resequence the list
+  show            Show running system information
+  statistics      Count packets that match the list
+  !!              Append to comment
+  <1-4294967295>  Sequence Number
+
+router(config-acl-test)#
+
+router(config-acl-test)#permit ?
+  ahp      Authentication Header Protocol
+  icmp     Internet Control Message Protocol
+  igmp     Internet Group Management Protocol (IGMP)
+  ip       Any Internet Protocol
+  ospf     OSPF routing protocol
+  pim      Protocol Independent Multicast (PIM)
+  tcp      Transmission Control Protocol
+  udp      User Datagram Protocol
+  vlan     vlan
+  vrrp     Virtual Router Redundancy Protocol
+  <0-255>  IP protocol number
+
+router(config-acl-test)#permit
+
+router(config-acl-test)#permit tcp ?
+  A.B.C.D    Source address
+  A.B.C.D/E  Source IP address with mask length
+  any        Any source host
+  host       A single source host
+
+router(config-acl-test)#permit tcp
+
+router(config-acl-test)#permit tcp 10.0.0.0/24 ?
+  A.B.C.D    Destination address
+  A.B.C.D/E  Destination IP address with mask length
+  any        Any destination host
+  eq         Match one or more port numbers (up to 10)
+  gt         Match ports greater than this number
+  host       A single destination host
+  lt         Match ports lower than this number
+  neq        Match ports not equal to these numbers (up to 10)
+  range      Match ports within two port numbers
+
+router(config-acl-test)#permit tcp 10.0.0.0/24
+
+
+router(config-acl-test)#permit tcp 10.0.0.0/23 eq ?
+  acap            Application Configuration Access Protocol (674)
+  acr-nema        ACR-NEMA Digital Imaging and Communications in Medicine (104)
+  afpovertcp      Apple Filing Protocol Over TCP (548)
+  arns            A Remote Network Server System (384)
+  asip-webadmin   AppleShare IP Web Administration (311)
+  at-rtmp         AppleTalk Routing Maintenance (201)
+  aurp            Appletalk Update-Based Routing Protocol (387)
+  bftp            Background File Transfer Program (152)
+  bgmp            Border Gateway Multicast Protocol (264)
+  bgp             Border Gateway Protocol (179)
+  chargen         Character Generator (19)
+  cisco-tdp       Cisco Tag Distribution Protocol (711)
+  citadel         Citadel (504)
+  clearcase       Clearcase albd (371)
+  cmd             Remote Shell/Rsh (514)
+  commerce        Commerce Applications (542)
+  courier         Remote Procedure Call (530)
+  csnet-ns        CCSO Name Server Protocol (105)
+  daytime         Daytime (13)
+  dhcp-failover2  DHCP Failover Protocol (847)
+  dhcpv6-client   DHCPv6 Client (546)
+  dhcpv6-server   DHCPv6 Server (547)
+  discard         Discard (9)
+  domain          Domain Name Service (53)
+  dsp             Display Support Protocol (33)
+  echo            Echo (7)
+  efs             Extended File Name Server (520)
+  epp             Extensible Provision Protocol (700)
+  esro-gen        Efficient Short Remote Operations (259)
+  exec            Remote Process Execution/Rexec (512)
+  finger          Finger (79)
+  ftp             File Transfer Protocol (21)
+  ftp-data        FTP data connections (20)
+  ftps            FTPS Protocol (control) (990)
+  ftps-data       FTPS Protocol (data) (989)
+  godi            Group Domain of Interpretation Protocol (848)
+  gopher          Gopher (70)
+  gre             Generic Routing Encapsulation (47)
+  ha-cluster      Linux-HA Heartbeat (694)
+  hostname        NIC hostname server (101)
+  hp-alarm-mgr    HP Performance Data Alarm Manager (383)
+  http-alt        Filemaker, Inc. -HTTP Alternate (591)
+  http-mgmt       http-mgmt (280)
+  http-rpc-epmap  HTTP RPC Ep Map (593)
+  https           HTTP Secure (HTTPS) (443)
+  ident           Ident Protocol (113)
+  ieee-mms-ssl    IEEE Media Management System Over SSL (695)
+  imap            Interim Mail Access Protocol (143)
+  imap3           Interactive Mail Access Protocol v3 (220)
+  imaps           Internet Message Access Protocol over SSL (993)
+  ipp             Internet Printing Protocol (631)
+  ipx             Internetwork Packet Exchange (213)
+  irc             Internet Relay Chat (194)
+  iris-beep       Internet Registry Information Service Over BEEP (702)
+  iscsi           Internet Small Computers Systems Interface (860)
+  isi-gl          ISI Graphics Language (55)
+  iso-tsap        ISO-TSAP Class 0 (102)
+  kerberos        Kerberos Authentication System (88)
+  kerberos-adm    Kerberos Administration (749)
+  klogin          Kerberos login (543)
+  kpasswd         Kerberos Change/Set Password (464)
+  kshell          Kerberos shell (544)
+  la-maint        IMP Logical Address Maintenance (51)
+  lanz            Lanz Streaming (50001)
+  ldap            Lightweight Directory Access Protocol (389)
+  ldaps           LDAP Over TLS/SSH (636)
+  lmp             Link Management Protocol (701)
+  login           Rlogin (513)
+  lpd             Line Printer Daemon (515)
+  mac-srvr-admin  MacOS Server Admin (660)
+  matip-type-a    MATIP Type A (350)
+  matip-type-b    MATIP Type B (351)
+  microsoft-ds    Microsoft-DS SMB File Sharing (445)
+  mlag            MLAG Protocol (4432)
+  mpp             Netix Message Posting Protocol (218)
+  ms-sql-m        Microsoft SQL Monitor (1434)
+  ms-sql-s        Microsoft SQL Server (1433)
+  msdp            Multicast Source Discovery Protocol (639)
+  msexch-routing  MS Exchange Routing (691)
+  msg-icp         MSG ICP (29)
+  msp             Message Send Protocol (18)
+  nas             Netnews Administration System (991)
+  ncp             NetWare Core Protocol (524)
+  netrjs-1        Remote Job Service (71)
+  netrjs-2        Remote Job Service (72)
+  netrjs-3        Remote Job Service (73)
+  netrjs-4        Remote Job Service (74)
+  netwnews        Readnews (532)
+  new-rwho        new-who (550)
+  nfs             Network File System (2049)
+  nntp            Network News Transport Protocol (119)
+  nntps           Network News Transfer Protocol Over TSL/SSH (563)
+  nsw-fe          NSW User System FE (27)
+  odmr            On Demand Mail Retry (366)
+  openvpn         OpenVPN (1194)
+  pim-auto-rp     PIM Auto-RP (496)
+  pkix-timestamp  PKIX Timestamp (318)
+  pkt-krb-ipsec   Internet Protocol Security (1293)
+  pop2            Post Office Protocol v2 (109)
+  pop3            Post Office Protocol v3 (110)
+  pop3s           Post Office Protocol 3 over TLS/SSL (995)
+  pptp            Microsoft Point-to-Point Tunneling Protocol (1723)
+  print-srv       Network PostScript (170)
+  ptp-event       Precision Time Protocol Event (319)
+  ptp-general     Precision Time Protocol General (320)
+  qmtp            The Quick Mail Transfer Protocol (209)
+  qotd            Quote of the Day (17)
+  radius          Radius Authentication Protocol (1812)
+  radius-acct     Radius Accounting Protocol (1813)
+  re-mail-ck      Remote Mail Checking Protocol (50)
+  remotefs        RFS Server (556)
+  repcmd          SupportSoft Nexus Remote Command (641)
+  rje             Remote Job Entry (5)
+  rlp             Resource Location Protocol (39)
+  rlzdbase        RLZ DBase (635)
+  rmc             Remote Monitoring and Control Protocol (657)
+  rpc2portmap     Rpc2portmap (369)
+  rsync           rysnc File Synchronization Protocol (873)
+  rtelnet         Remote Telnet Service (107)
+  rtsp            Real Time Streaming Protocol (554)
+  sgmp            Simple Gateway Monitoring Protocol (153)
+  silc            Secure Internet Live Conferencing (706)
+  smtp            Simple Mail Transport Protocol (25)
+  smux            SNMP Unix Multiplexer (199)
+  snagas          SNA Gateway Access Server (108)
+  snmp            Simple Network Management Protocol (161)
+  snmptrap        SNMP Traps (162)
+  snpp            Simple Network Paging Protocol (444)
+  sqlserv         SQL Services (118)
+  sqlsrv          SQL Service (156)
+  ssh             Secure Shell Protocol (22)
+  submission      Email Message Submission (587)
+  sunrpc          Sun Remote Procedure Call (111)
+  svrloc          Server Location Protocol (427)
+  systat          Active users (11)
+  tacacs          TAC Access Control System (49)
+  talk            Talk (517)
+  tbrpf           Topology Broadcast based on Reverse-Path Forwarding Protocol (712)
+  tcpmux          TCP Port Service Multiplexer (1)
+  tcpnethaspsrv   Aladdin Knowledge Systems Hasp services, TCP/IP version (475)
+  telnet          Telnet Protocol (23)
+  time            Time (37)
+  tunnel          TUNNEL Profile (604)
+  ups             Uninterruptible Power Supply (401)
+  uucp            Unix-to-Unix Copy Program (540)
+  uucp-path       UUCP Path Service (117)
+  vmnet           VMNET (175)
+  whois           Nicname (43)
+  www             World Wide Web (HTTP) (80)
+  xns-ch          XNS (Xerox Network Systems) Clearinghouse (54)
+  xns-mail        XNS (Xerox Network Systems) Mail (58)
+  xns-time        XNS (Xerox Network Systems) Time Protocol (52)
+  z39-50          ANSI Z39.50 (210)
+  <0-65535>       Port number
+
+  router(config-acl-test)#permit tcp 10.0.0.0/23 eq 1000 10.0.0.0/23 ?
+    ack          Match on the ACK bit
+    dscp         Match packets by DSCP value
+    eq           Match one or more port numbers (up to 10)
+    established  Match packets in existing TCP connections
+    fin          Match on the FIN bit
+    fragments    Match non-head fragment packets
+    gt           Match ports greater than this number
+    log          Log matches against this rule
+    lt           Match ports lower than this number
+    neq          Match ports not equal to these numbers (up to 10)
+    psh          Match on the PSH bit
+    range        Match ports within two port numbers
+    rst          Match on the RST bit
+    syn          Match on the SYN bit
+    tracked      Match packets in existing ICMP/UDP/TCP connections
+    ttl          Match TTL (Time-to-Live) value
+    urg          Match on the URG bit
+    <cr>

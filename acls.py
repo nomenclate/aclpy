@@ -1,19 +1,27 @@
 import ipaddress
 
+class Conditions(object):
+    """Container class for Conditions"""
+    pass
+
+class Condition(object):
+    """Conditions are a part of Entries"""
+    pass
+
 class Entries(list):
     """Container class for Entries"""
     pass
 
 class Entry(object):
     """An Entry in an AccessList"""
-    def __init__(self, name=None, line=None, action=None, condition=None):
+    def __init__(self, name=None, line=None, action=None, conditions=None):
         self.name = name
         self.line = line
         self.action = action
-        if condition is None:
-            self.condition = Conditions()
+        if conditions is None:
+            self.conditions = Conditions()
         else:
-            self.condition = condition
+            self.conditions = conditions
 
         @property
         def name(self):
@@ -54,6 +62,10 @@ class Entry(object):
         def condition(self, value):
             """Set condition"""
             self._condition = value
+
+        def check_for_match(self, arg):
+            """Checks for matches agasint Conditions in AccessList"""
+            pass
 
 
 class AccessList(object):

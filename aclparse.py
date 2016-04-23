@@ -47,12 +47,11 @@ counter = (lb +
 
 condition = (protocol('protocol') +
             (anyip ^ hostip ^ net)('srcip') +
-            (pp.Optional(testop('srcop') + srcport('srcports'))) +
+            ((pp.Optional(testop('srcop') + srcport('srcports'))) ^
+             (pp.Optional(rangeop('srcop') + ports + ports))) +
             (anyip ^ hostip ^ net)('dstip') +
-                (
-                 (pp.Optional(testop('dstop') + dstport('dstports'))) ^
-                 (pp.Optional(rangeop('dstop') + ports + ports))
-                 )
+            ((pp.Optional(testop('dstop') + dstport('dstports'))) ^
+             (pp.Optional(rangeop('dstop') + ports + ports)))
              )
 
 aclentry = (lineno('index') +

@@ -51,7 +51,12 @@ class Entry(object):
         @property.setter
         def action(self, value):
             """Set action"""
-            self._action = value
+            #FIXME: need unit test for error
+            if action in ('permit','deny'):
+                self._action = value
+            else:
+                raise NotImplementedError('action {} not implemented'
+                                          .format(value))
 
         @property
         def condition(self):

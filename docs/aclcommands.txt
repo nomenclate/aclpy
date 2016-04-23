@@ -229,3 +229,30 @@ router(config-acl-test)#permit tcp 10.0.0.0/23 eq ?
     ttl          Match TTL (Time-to-Live) value
     urg          Match on the URG bit
     <cr>
+
+
+    clt-dc1-ds03(config-acl-test)#permit icmp any any ?
+  administratively-prohibited  Communication administratively prohibited (3/13)
+  alternate-address            Alternate host address (6)
+  conversion-error             Datagram conversion error (31)
+  dod-host-prohibited          Communication with host prohibited (3/10)
+  dod-net-prohibited           Communication with network prohibited (3/9)
+  dscp                         Match packets by DSCP value or name
+  echo                         Echo (8)
+  echo-reply                   Echo reply (0)
+  fragments                    Match non-head fragment packets
+  general-parameter-problem    General parameter problem (12/0)
+  host-isolated                Source host isolated (3/8)
+  host-precedence-unreachable  Host precedence violation (3/14)
+  host-redirect                Host redirect (5/1)
+  host-tos-redirect            Host and type of service redirect (5/3)
+  host-tos-unreachable         Host unreachable for type of service (3/12)
+  host-unknown                 Host unknown (3/7)
+  host-unreachable             Host unreachable (3/1)
+  information-reply            Information replies (16)
+  information-request          Information requests (15)
+  log                          Log matches against this rule
+  mask-reply                   Address mask replies (18)
+
+
+  

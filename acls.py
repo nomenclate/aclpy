@@ -13,7 +13,7 @@ codenames = {
 class _Condition(object):
     """A match condition for an AccessList Entry"""
     def __init__(self,
-                 protocol=None,
+                 protocol='ip',
                  srcip=None,
                  dstip=None,
                  srcport=None,

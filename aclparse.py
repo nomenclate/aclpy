@@ -16,7 +16,7 @@ host = pp.Literal('host')
 lineno = pp.Word(pp.nums)
 count = pp.Word(pp.nums)
 action = pp.oneOf('permit deny')
-testop = pp.oneOf('lt gt eq neq')
+portop = pp.oneOf('lt gt eq neq')
 ports = pp.Word(pp.alphanums+'-')
 protocol = pp.oneOf('ip tcp udp')
 rangeop = pp.Literal('range')
@@ -47,10 +47,10 @@ counter = (lb +
 
 condition = (protocol('protocol') +
             (anyip ^ hostip ^ net)('srcip') +
-            ((pp.Optional(testop('srcop') + srcport('srcports'))) ^
+            ((pp.Optional(portop('srcop') + srcport('srcports'))) ^
              (pp.Optional(rangeop('srcop') + ports + ports))) +
             (anyip ^ hostip ^ net)('dstip') +
-            ((pp.Optional(testop('dstop') + dstport('dstports'))) ^
+            ((pp.Optional(portop('dstop') + dstport('dstports'))) ^
              (pp.Optional(rangeop('dstop') + ports + ports)))
              )
 

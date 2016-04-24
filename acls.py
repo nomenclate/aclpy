@@ -1,17 +1,17 @@
 import ipaddress
 
-protocols = {
+protocolnames = {
+                }
+
+portnames = {
             }
 
-ports = {
-        }
-
-codes = {
-        }
+codenames = {
+            }
 
 
 class Condition(object):
-    """A match conditions for an AccessList Entry"""
+    """A match condition for an AccessList Entry"""
     def __init__(self,
                  protocol=None,
                  srcip=None,
@@ -87,24 +87,20 @@ class Condition(object):
         """Set prototocol"""
         self._code = value
 
-class Conditions(object):
-    """Container class for Conditions"""
-    pass
-
 class Entries(list):
     """Container class for Entries"""
     pass
 
-class Condition(object):
-    """An Condition in an AccessList"""
-    def __init__(self, name=None, line=None, action=None, conditions=None):
+class Entry(object):
+    """An Entry in an AccessList"""
+    def __init__(self, name=None, line=None, action=None, condition=None):
         self.name = name
         self.line = line
         self.action = action
-        if conditions is None:
-            self.conditions = Conditions()
+        if condition is None:
+            self.condition = Condition()
         else:
-            self.conditions = conditions
+            self.condition = condition
 
     @property
     def name(self):

@@ -1,6 +1,12 @@
 import acls
 import pyparsing as pp
 
+def portstodict(string, lok, tokens):
+    if len(tokens) == 0:
+        return None
+    else:
+        return {'portop':tokens[0],'port':tokens[1].asList()}
+
 def tokentoip(iptype):
     def parseAction(string, loc, tokens):
         if iptype == 'any':
@@ -16,7 +22,7 @@ host = pp.Literal('host')
 lineno = pp.Word(pp.nums)
 count = pp.Word(pp.nums)
 action = pp.oneOf('permit deny')
-portop = pp.oneOf('lt gt eq neq')
+portop = pp.oneOf('lt gt eq neq range')
 ports = pp.Word(pp.alphanums+'-')
 protocol = pp.oneOf('ip tcp udp')
 rangeop = pp.Literal('range')
@@ -33,9 +39,9 @@ net = pp.Combine(ipaddr +
                  cidrmask,
                  joinString='/')
 anyip = pp.Literal('any').setParseAction(tokentoip('any'))
-srcport = pp.OneOrMore(~(anyip ^ net ^ hostip) + ports)
+srcport = pp.Group(pp.OneOrMore(~(anyip ^ net ^ hostip) + ports))
 dstport = pp.OneOrMore(ports)
-
+dstports = pp.Group(dstport)
 
 counter = (lb +
            pp.Literal('match').suppress() +
@@ -47,11 +53,9 @@ counter = (lb +
 
 condition = (protocol('protocol') +
             (anyip ^ hostip ^ net)('srcip') +
-            ((pp.Optional(portop('srcop') + srcport('srcports'))) ^
-             (pp.Optional(rangeop('srcop') + ports + ports))) +
+            (pp.Optional((portop + srcport)))('srcport').setParseAction(portstodict) +
             (anyip ^ hostip ^ net)('dstip') +
-            ((pp.Optional(portop('dstop') + dstport('dstports'))) ^
-             (pp.Optional(rangeop('dstop') + ports + ports)))
+            (pp.Optional((portop + dstports)))('dstport').setParseAction(portstodict)
              )
 
 aclentry = (lineno('index') +

@@ -100,7 +100,7 @@ class Entry(object):
         if condition is None:
             self.condition = Condition()
         else:
-            self.condition = condition
+            self.condition = Condition(**condition)
 
     @property
     def name(self):
@@ -131,7 +131,7 @@ class Entry(object):
     def action(self, value):
         """Set action"""
         #FIXME: need unit test for error
-        if action in ('permit','deny'):
+        if value in ('permit','deny'):
             self._action = value
         else:
             raise NotImplementedError('action {} not implemented'.format(value))

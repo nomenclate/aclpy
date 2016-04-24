@@ -10,11 +10,11 @@ def test_name():
 
     result = acl.parseString(showacltest)
 
-    parsedacl = acls.AccessList()
-    parsedacl.name = result['name']
-
-    for n in result['entry']:
-        parsedacl.entries.append(n.asDict())
+    parsedacl = acls.AccessList(name=result['name'])
+    for entry in result['entry']:
+        parsedacl.append(acls.Entry(line=entry['index'],
+                         action=entry['action'],
+                         condition=entry['condition']))
 
     name = 'THIS_IS_A_NAME'
 

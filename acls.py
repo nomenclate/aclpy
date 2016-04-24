@@ -87,10 +87,6 @@ class _Condition(object):
         """Set prototocol"""
         self._code = value
 
-class _Entries(list):
-    """Container class for Entries"""
-    pass
-
 class Entry(object):
     """An Entry in an AccessList"""
     def __init__(self, name=None, line=None, action=None, condition=None):
@@ -143,20 +139,33 @@ class Entry(object):
 
 class AccessList(object):
     """An AccessList"""
-    def __init__(self, name=None):
-        super(AccessList, self).__init__()
-        self._entries = _Entries()
+    def __init__(self, entries=None, name=None):
+        if entries is None:
+            self.entries = []
+        else:
+            self.entries = entries
         self.name = name
 
-    @property
-    def entries(self):
-        """Get entries"""
-        return self._entries
+    def __len__(self):
+        return len(self.entries)
 
-    @entries.setter
-    def entries(self, value):
-        """Set entries"""
-        self._entries = value
+    def __getitem__(self, key):
+        return self.entries[key]
+
+    def __setitem__(self, key, value):
+        self.entries[key] = value
+
+    def __delitem__(self, key):
+        del self.entries[key]
+
+    def __iter__(self):
+        return iter(self.entries)
+
+    def append(self, value):
+        if isinstance(value, Entry):
+            self.entries.append(value)
+        else:
+            raise TypeError('{} is not a supported type'.format(type(value)))
 
     @property
     def name(self):

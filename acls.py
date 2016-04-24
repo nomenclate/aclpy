@@ -1,19 +1,102 @@
 import ipaddress
 
-class Conditions(object):
-    """Container class for Conditions"""
-    pass
+protocols = {
+            }
+
+ports = {
+        }
+
+codes = {
+        }
+
 
 class Condition(object):
-    """Conditions are a part of Entries"""
+    """A match conditions for an AccessList Entry"""
+    def __init__(self,
+                 protocol=None,
+                 srcip=None,
+                 dstip=None,
+                 srcport=None,
+                 dstport=None,
+                 code=None):
+
+        self.protocol = protocol
+        self.srcip = srcip
+        self.dstip = dstip
+        self.srcport = srcport
+        self.dstport = dstport
+        self.code = code
+
+    @property
+    def protocol(self):
+        """Get protocol of Condition"""
+        return self._protocol
+
+    @protocol.setter
+    def protocol(self, value):
+        """Set protocol"""
+        self._protocol = value
+
+    @property
+    def srcip(self):
+        """Get srcip of Condition"""
+        return self._srcip
+
+    @srcip.setter
+    def srcip(self, value):
+        """Set prototocol"""
+        self._srcip = value
+
+    @property
+    def dstip(self):
+        """Get dstip of Condition"""
+        return self._dstip
+
+    @dstip.setter
+    def dstip(self, value):
+        """Set prototocol"""
+        self._dstip = value
+
+    @property
+    def srcport(self):
+        """Get srcport of Condition"""
+        return self._srcport
+
+    @srcport.setter
+    def srcport(self, value):
+        """Set prototocol"""
+        self._srcport = value
+
+    @property
+    def dstport(self):
+        """Get dstport of Condition"""
+        return self._dstport
+
+    @dstport.setter
+    def dstport(self, value):
+        """Set prototocol"""
+        self._dstport = value
+
+    @property
+    def code(self):
+        """Get code of Condition"""
+        return self._code
+
+    @code.setter
+    def code(self, value):
+        """Set prototocol"""
+        self._code = value
+
+class Conditions(object):
+    """Container class for Conditions"""
     pass
 
 class Entries(list):
     """Container class for Entries"""
     pass
 
-class Entry(object):
-    """An Entry in an AccessList"""
+class Condition(object):
+    """An Condition in an AccessList"""
     def __init__(self, name=None, line=None, action=None, conditions=None):
         self.name = name
         self.line = line
@@ -23,54 +106,53 @@ class Entry(object):
         else:
             self.conditions = conditions
 
-        @property
-        def name(self):
-            """Get name of Entry"""
-            return self._name
+    @property
+    def name(self):
+        """Get name of Condition"""
+        return self._name
 
-        @property.setter
-        def name(self, value):
-            """Set Name"""
-            self._name = value
+    @name.setter
+    def name(self, value):
+        """Set Name"""
+        self._name = value
 
-        @property
-        def line(self):
-            """Get line of Entry"""
-            return self._line
+    @property
+    def line(self):
+        """Get line of Condition"""
+        return self._line
 
-        @property.setter
-        def line(self, value):
-            """Set line"""
-            self._line = value
+    @line.setter
+    def line(self, value):
+        """Set line"""
+        self._line = value
 
-        @property
-        def action(self):
-            """Get action of Entry"""
-            return self._action
+    @property
+    def action(self):
+        """Get action of Condition"""
+        return self._action
 
-        @property.setter
-        def action(self, value):
-            """Set action"""
-            #FIXME: need unit test for error
-            if action in ('permit','deny'):
-                self._action = value
-            else:
-                raise NotImplementedError('action {} not implemented'
-                                          .format(value))
+    @action.setter
+    def action(self, value):
+        """Set action"""
+        #FIXME: need unit test for error
+        if action in ('permit','deny'):
+            self._action = value
+        else:
+            raise NotImplementedError('action {} not implemented'.format(value))
 
-        @property
-        def condition(self):
-            """Get condition"""
-            return self._condition
+    @property
+    def condition(self):
+        """Get condition"""
+        return self._condition
 
-        @condition.setter
-        def condition(self, value):
-            """Set condition"""
-            self._condition = value
+    @condition.setter
+    def condition(self, value):
+        """Set condition"""
+        self._condition = value
 
-        def check_for_match(self, arg):
-            """Checks for matches agasint Conditions in AccessList"""
-            pass
+    def check_for_match(self, arg):
+        """Checks for matches agasint Conditions in AccessList"""
+        pass
 
 
 class AccessList(object):

@@ -10,7 +10,7 @@ codenames = {
             }
 
 
-class Condition(object):
+class _Condition(object):
     """A match condition for an AccessList Entry"""
     def __init__(self,
                  protocol=None,
@@ -87,7 +87,7 @@ class Condition(object):
         """Set prototocol"""
         self._code = value
 
-class Entries(list):
+class _Entries(list):
     """Container class for Entries"""
     pass
 
@@ -98,9 +98,9 @@ class Entry(object):
         self.line = line
         self.action = action
         if condition is None:
-            self.condition = Condition()
+            self.condition = _Condition()
         else:
-            self.condition = Condition(**condition)
+            self.condition = _Condition(**condition)
 
     @property
     def name(self):
@@ -136,16 +136,6 @@ class Entry(object):
         else:
             raise NotImplementedError('action {} not implemented'.format(value))
 
-    @property
-    def condition(self):
-        """Get condition"""
-        return self._condition
-
-    @condition.setter
-    def condition(self, value):
-        """Set condition"""
-        self._condition = value
-
     def check_for_match(self, arg):
         """Checks for matches agasint Conditions in AccessList"""
         pass
@@ -153,12 +143,9 @@ class Entry(object):
 
 class AccessList(object):
     """An AccessList"""
-    def __init__(self, entries=None, name=None):
+    def __init__(self, name=None):
         super(AccessList, self).__init__()
-        if not entries:
-            self.entries = Entries()
-        else:
-            self.entries = entries
+        self._entries = _Entries()
         self.name = name
 
     @property

@@ -1,17 +1,13 @@
 import ipaddress
 
-protocolnames = {
-                }
-
-portnames = {
-            }
-
-codenames = {
-            }
-
-
 class _Condition(object):
     """A match condition for an AccessList Entry"""
+
+    # pylint: disable=too-many-instance-attributes
+    # I'm cool with this
+    # pylint: disable=too-many-arguments
+    # I'm cool with this too
+
     def __init__(self,
                  protocol=None,
                  srcip=None,
@@ -20,7 +16,13 @@ class _Condition(object):
                  dstport=None,
                  code=None):
 
-        if protocol == None:
+        self._protocol = None
+        self._srcip = None
+        self._dstip = None
+        self._srcport = None
+        self._dstport = None
+        self._code = None
+        if protocol is None:
             self.protocol = 'ip'
         else:
             self.protocol = protocol
@@ -93,9 +95,12 @@ class _Condition(object):
 class Entry(object):
     """An Entry in an AccessList"""
     def __init__(self, name=None, line=None, action=None, condition=None):
+        self._name = None
+        self._line = None
+        self._action = None
         self.name = name
         self.line = line
-        if action == None:
+        if action is None:
             self.action = 'permit'
         else:
             self.action = action
@@ -133,10 +138,10 @@ class Entry(object):
     def action(self, action):
         """Set action"""
         #FIXME: need unit test for error
-        if action in ('permit','deny'):
+        if action in ('permit', 'deny'):
             self._action = action
         else:
-            raise NotImplementedError('action {} not implemented'.format(value))
+            raise NotImplementedError('action {} not implemented'.format(action))
 
     def check_for_match(self, arg):
         """Checks for matches agasint Conditions in AccessList"""
@@ -176,13 +181,13 @@ class AccessList(object):
         if isinstance(entry, Entry):
             self.__entries.append(entry)
         else:
-            raise TypeError('{} is not a supported type'.format(type(value)))
+            raise TypeError('{} is not a supported type'.format(type(entry)))
 
     def insert(self, key, entry):
         if isinstance(entry, Entry):
             self.__entries.insert(self, key, entry)
         else:
-            raise TypeError('{} is not a supported type'.format(type(value)))
+            raise TypeError('{} is not a supported type'.format(type(entry)))
         pass
 
     def resequence(self, step=1):
@@ -198,7 +203,7 @@ class AccessList(object):
         if step <= 0:
             raise ValueError('step must be positive non zero value')
 
-        for entry,n in zip(self, range(step, len(self)*step+step, step)):
+        for entry, n in zip(self, range(step, len(self)*step+step, step)):
             entry.line = n
 
     @property

@@ -3,6 +3,25 @@ from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
 
+def _string_to_ip(ipaddress):
+    """Converts ip address as string to an IPv4Address (if host address)
+    or  IPv4Network (if network address) uses ipaddress from std lib
+
+    Args:
+        ipaddress (str): an IP address as a string either as a host
+            address (i.e. 10.0.0.0) or as a CIDR network (i.e. 10.0.0.0/8)
+
+    Returns:
+        either an IPv4Address or IPv4Network depending on contents of
+            ipaddress
+    """
+    if '/' in ipaddress:
+        return IPv4Network(ipaddress)
+    else:
+        return IPv4Address(ipaddress)
+
+
+
 class _Condition(object):
     """A match condition for an AccessList Entry"""
 
@@ -53,7 +72,7 @@ class _Condition(object):
     @srcip.setter
     def srcip(self, value):
         """Set prototocol"""
-        self._srcip = value
+        self._srcip = _string_to_ip(value)
 
     @property
     def dstip(self):
@@ -63,7 +82,7 @@ class _Condition(object):
     @dstip.setter
     def dstip(self, value):
         """Set prototocol"""
-        self._dstip = value
+        self._dstip = _string_to_ip(value)
 
     @property
     def srcport(self):
@@ -106,11 +125,10 @@ class Entry(object):
                  counter=None):
 
         self._name = None
-        self._index = None
-        self._action = None
-        self._counter = None
         self.name = name
+        self._index = None
         self.index = index
+        self._action = None
         if action is None:
             self.action = 'permit'
         else:
@@ -119,7 +137,8 @@ class Entry(object):
             self.condition = _Condition()
         else:
             self.condition = _Condition(**condition)
-        self.counter = _counter(int(counter['hits']), counter['delta'])
+        if counter:
+            self.counter = _counter(int(counter['hits']), counter['delta'])
 
     @property
     def name(self):

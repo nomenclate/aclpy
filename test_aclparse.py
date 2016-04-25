@@ -12,7 +12,7 @@ def test_name():
 
     parsedacl = acls.AccessList(name=result['name'])
     for entry in result['entry']:
-        parsedacl.append(acls.Entry(line=entry['index'],
+        parsedacl.append(acls.Entry(index=entry['index'],
                          action=entry['action'],
                          condition=entry['condition']))
 

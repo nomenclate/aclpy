@@ -1,25 +1,18 @@
-import acls
 import pyparsing as pp
 
-def portstodict(string, lok, tokens):
+def ports_to_dict(string, loc, tokens):
     if len(tokens) == 0:
         return None
     else:
-        return {'portop':tokens[0],'port':tokens[1].asList()}
+        return {'portop':tokens[0], 'port':tokens[1].asList()}
 
-def tokentoip(iptype):
+def token_to_ip(iptype):
     def parseAction(string, loc, tokens):
         if iptype == 'any':
-            r = '0.0.0.0/0'
-        if iptype == 'host':
-            r = tokens[0] + '/32'
-        return r
+            return '0.0.0.0/0'
+        elif iptype == 'host':
+            return tokens[0] + '/32'
     return parseAction
-
-def checkcounter(string, lok, tokens):
-    if len(tokens) == 0:
-        print(tokens)
-        return  {'hits': None, 'delta': None}
 
 pp.ParserElement.setDefaultWhitespaceChars(' \t')
 lb, rb, dot, comma, slash = map(pp.Suppress, "[].,/")
@@ -38,13 +31,13 @@ ipaddr = pp.Combine(ipoctet + (dot + ipoctet) * 3, joinString='.')
 name = pp.Combine((pp.Literal('IP Access List ').suppress()) +
                   pp.Word(pp.alphas+'_-'))
 
-hostip = (host.suppress() + ipaddr).setParseAction(tokentoip('host'))
+hostip = (host.suppress() + ipaddr).setParseAction(token_to_ip('host'))
 net = pp.Combine(ipaddr +
                  slash +
                  cidrmask,
                  joinString='/')
 
-anyip = pp.Literal('any').setParseAction(tokentoip('any'))
+anyip = pp.Literal('any').setParseAction(token_to_ip('any'))
 srcport = portop + pp.Group(pp.OneOrMore(~(anyip ^ net ^ hostip) + ports))
 dstports = portop + pp.Group(pp.OneOrMore(ports))
 
@@ -56,10 +49,10 @@ counter = (lb +
            rb)
 
 condition = (protocol('protocol') +
-            (anyip ^ hostip ^ net)('srcip') +
-            (pp.Optional((srcport)))('srcport').setParseAction(portstodict) +
-            (anyip ^ hostip ^ net)('dstip') +
-            (pp.Optional((dstports)))('dstport').setParseAction(portstodict))
+             (anyip ^ hostip ^ net)('srcip') +
+             (pp.Optional((srcport)))('srcport').setParseAction(ports_to_dict) +
+             (anyip ^ hostip ^ net)('dstip') +
+             (pp.Optional((dstports)))('dstport').setParseAction(ports_to_dict))
 
 aclentry = (lineno('index') +
             action('action') +
@@ -69,5 +62,5 @@ aclentry = (lineno('index') +
 
 acl = (name('name') + pp.LineEnd().suppress() +
        (pp.Literal('statistics per-entry') +
-       pp.LineEnd()).suppress() +
-       pp.OneOrMore(aclentry))
+        pp.LineEnd()).suppress() +
+        pp.OneOrMore(aclentry))

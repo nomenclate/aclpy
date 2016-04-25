@@ -16,6 +16,11 @@ def tokentoip(iptype):
         return r
     return parseAction
 
+def checkcounter(string, lok, tokens):
+    if len(tokens) == 0:
+        print(tokens)
+        return  {'hits': None, 'delta': None}
+
 pp.ParserElement.setDefaultWhitespaceChars(' \t')
 lb, rb, dot, comma, slash = map(pp.Suppress, "[].,/")
 host = pp.Literal('host')
@@ -31,41 +36,38 @@ cidrmask = pp.Word(pp.nums, max=2)
 ipaddr = pp.Combine(ipoctet + (dot + ipoctet) * 3, joinString='.')
 
 name = pp.Combine((pp.Literal('IP Access List ').suppress()) +
-                  pp.Word(pp.alphas+'_-')
-                  )
+                  pp.Word(pp.alphas+'_-'))
+
 hostip = (host.suppress() + ipaddr).setParseAction(tokentoip('host'))
 net = pp.Combine(ipaddr +
                  slash +
                  cidrmask,
                  joinString='/')
+
 anyip = pp.Literal('any').setParseAction(tokentoip('any'))
-srcport = pp.Group(pp.OneOrMore(~(anyip ^ net ^ hostip) + ports))
-dstport = pp.OneOrMore(ports)
-dstports = pp.Group(dstport)
+srcport = portop + pp.Group(pp.OneOrMore(~(anyip ^ net ^ hostip) + ports))
+dstports = portop + pp.Group(pp.OneOrMore(ports))
 
 counter = (lb +
            pp.Literal('match').suppress() +
            count('hits') +
            comma +
            pp.SkipTo(']')('delta') +
-           rb
-           )
+           rb)
 
 condition = (protocol('protocol') +
             (anyip ^ hostip ^ net)('srcip') +
-            (pp.Optional((portop + srcport)))('srcport').setParseAction(portstodict) +
+            (pp.Optional((srcport)))('srcport').setParseAction(portstodict) +
             (anyip ^ hostip ^ net)('dstip') +
-            (pp.Optional((portop + dstports)))('dstport').setParseAction(portstodict)
-             )
+            (pp.Optional((dstports)))('dstport').setParseAction(portstodict))
 
 aclentry = (lineno('index') +
             action('action') +
             condition('condition') +
-            pp.Optional(counter('counter')) +
-            pp.LineEnd().suppress()
-            )('entry*')
+            pp.Optional(counter('counter'), default=None) +
+            pp.LineEnd().suppress())('entry*')
 
 acl = (name('name') + pp.LineEnd().suppress() +
-       (pp.Literal('statistics per-entry') + pp.LineEnd()).suppress() +
-       pp.OneOrMore(aclentry)
-       )
+       (pp.Literal('statistics per-entry') +
+       pp.LineEnd()).suppress() +
+       pp.OneOrMore(aclentry))

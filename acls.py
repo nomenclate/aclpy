@@ -13,14 +13,17 @@ codenames = {
 class _Condition(object):
     """A match condition for an AccessList Entry"""
     def __init__(self,
-                 protocol='ip',
+                 protocol=None,
                  srcip=None,
                  dstip=None,
                  srcport=None,
                  dstport=None,
                  code=None):
 
-        self.protocol = protocol
+        if protocol == None:
+            self.protocol = 'ip'
+        else:
+            self.protocol = protocol
         self.srcip = srcip
         self.dstip = dstip
         self.srcport = srcport
@@ -33,9 +36,9 @@ class _Condition(object):
         return self._protocol
 
     @protocol.setter
-    def protocol(self, value):
+    def protocol(self, protocol):
         """Set protocol"""
-        self._protocol = value
+        self._protocol = protocol
 
     @property
     def srcip(self):
@@ -92,7 +95,10 @@ class Entry(object):
     def __init__(self, name=None, line=None, action=None, condition=None):
         self.name = name
         self.line = line
-        self.action = action
+        if action == None:
+            self.action = 'permit'
+        else:
+            self.action = action
         if condition is None:
             self.condition = _Condition()
         else:
@@ -124,11 +130,11 @@ class Entry(object):
         return self._action
 
     @action.setter
-    def action(self, value):
+    def action(self, action):
         """Set action"""
         #FIXME: need unit test for error
-        if value in ('permit','deny'):
-            self._action = value
+        if action in ('permit','deny'):
+            self._action = action
         else:
             raise NotImplementedError('action {} not implemented'.format(value))
 
@@ -165,6 +171,9 @@ class AccessList(object):
 
     def __iter__(self):
         return iter(self.entries)
+
+    def output(self):
+        pass
 
     def append(self, entry):
         if isinstance(entry, Entry):

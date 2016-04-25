@@ -138,7 +138,12 @@ class Entry(object):
 
 
 class AccessList(object):
-    """An AccessList"""
+    """a List like object for interacting with access lists
+
+    Attributes:
+        name (str): A string that functions as the name of the access lists.
+            Used as the name when output named access-lists """
+
     def __init__(self, entries=None, name=None):
         if entries is None:
             self.entries = []
@@ -161,11 +166,27 @@ class AccessList(object):
     def __iter__(self):
         return iter(self.entries)
 
-    def append(self, value):
-        if isinstance(value, Entry):
-            self.entries.append(value)
+    def append(self, entry):
+        if isinstance(entry, Entry):
+            self.entries.append(entry)
         else:
             raise TypeError('{} is not a supported type'.format(type(value)))
+
+    def resequence(self, step=1):
+        """Resequences line numbers of accesslist incrementing by step
+        value
+
+        Args:
+            step (Optional[int]): the value to increment by. Defaults to 1
+
+        Raises:
+            ValueError: If step is less than or equal to zero
+        """
+        if step <= 0:
+            raise ValueError('step must be positive non zero value')
+
+        for entry,n in zip(self, range(step, len(self)*step+step, step)):
+            entry.line = n
 
     @property
     def name(self):

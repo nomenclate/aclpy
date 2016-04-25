@@ -8,11 +8,9 @@ _counter = namedtuple('counter', ['hits', 'delta'])
 def _string_to_ip(ipaddress):
     """Converts ip address as string to an IPv4Address (if host address)
     or IPv4Network (if network address) uses ipaddress from std lib
-
     Args:
         ipaddress (str): an IP address as a string either as a host
             address (i.e. 10.0.0.0) or as a CIDR network (i.e. 10.0.0.0/8)
-
     Returns:
         either an IPv4Address or IPv4Network depending on contents of
             ipaddress
@@ -188,7 +186,6 @@ class Entry(object):
 
 class AccessList(object):
     """a List like object for interacting with access lists
-
     Attributes:
         name (str): A string that functions as the name of the access lists.
             Used as the name when outputing named access-lists """
@@ -234,10 +231,8 @@ class AccessList(object):
     def resequence(self, step=1):
         """Resequences line numbers of accesslist incrementing by step
         value
-
         Args:
             step (Optional[int]): the value to increment by. Defaults to 1
-
         Raises:
             ValueError: If step is less than or equal to zero
         """

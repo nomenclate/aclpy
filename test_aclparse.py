@@ -1,20 +1,24 @@
 import pytest
-import acls
+from acls import AccessList, Entry
 from aclparse import acl
 
 
 def test_name():
     #test setup
     with open('aristaacl.txt', 'r') as f:
-        showacltest = f.read()
+        data = f.read()
 
-    result = acl.parseString(showacltest)
+    result = acl.parseString(data)
 
-    parsedacl = acls.AccessList(name=result['name'])
+    parsedacl = AccessList(name=result['name'])
+
+    parsedacl = AccessList(name=result['name'])
     for entry in result['entry']:
-        parsedacl.append(acls.Entry(index=entry['index'],
-                         action=entry['action'],
-                         condition=entry['condition']))
+        parsedacl.append(Entry(index=entry['index'],
+                               action=entry['action'],
+                               condition=entry['condition'],
+                               counter=entry['counter']
+                               ))
 
     name = 'THIS_IS_A_NAME'
 
@@ -22,4 +26,4 @@ def test_name():
     assert parsedacl.name == name
     assert result['name'] == name
     assert parsedacl.name == result['name']
-    assert len(parsedacl) == len(showacltest.splitlines())-2
+    assert len(parsedacl) == len(data.splitlines())-2

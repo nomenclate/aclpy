@@ -11,5 +11,6 @@ IP Access List THIS_IS_A_NAME
         85 permit tcp 10.10.28.0/23 range 2000 2001 host 131.107.218.50 range 8000 8086
         90 permit tcp 10.10.28.0/23 gt 1024 host 131.107.218.155 eq https
         95 permit tcp 10.10.28.0/23 neq 1024 host 131.107.218.155 eq https
+        96 permit 1 host 10.10.0.1 any
         100 deny ip any any [match 151250, 0:08:53 ago]
         110 permit udp any gt 1024 any eq bootps bootpc [match 10551, 0:11:57 ago]

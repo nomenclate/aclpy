@@ -1,4 +1,7 @@
-import ipaddress
+from ipaddress import IPv4Address, IPv4Network
+from collections import namedtuple
+
+_counter = namedtuple('counter', ['hits', 'delta'])
 
 class _Condition(object):
     """A match condition for an AccessList Entry"""
@@ -94,12 +97,20 @@ class _Condition(object):
 
 class Entry(object):
     """An Entry in an AccessList"""
-    def __init__(self, name=None, line=None, action=None, condition=None):
+
+    # pylint: disable=too-many-instance-attributes
+    # I'm cool with this
+    # pylint: disable=too-many-arguments
+    # I'm cool with this too
+    def __init__(self, name=None, index=None, action=None, condition=None,
+                 counter=None):
+
         self._name = None
-        self._line = None
+        self._index = None
         self._action = None
+        self._counter = None
         self.name = name
-        self.line = line
+        self.index = index
         if action is None:
             self.action = 'permit'
         else:
@@ -108,6 +119,7 @@ class Entry(object):
             self.condition = _Condition()
         else:
             self.condition = _Condition(**condition)
+        self.counter = _counter(int(counter['hits']), counter['delta'])
 
     @property
     def name(self):
@@ -120,14 +132,14 @@ class Entry(object):
         self._name = value
 
     @property
-    def line(self):
-        """Get line of Condition"""
-        return self._line
+    def index(self):
+        """Get index of Condition"""
+        return self._index
 
-    @line.setter
-    def line(self, value):
-        """Set line"""
-        self._line = value
+    @index.setter
+    def index(self, value):
+        """Set index"""
+        self._index = value
 
     @property
     def action(self):
@@ -157,6 +169,7 @@ class AccessList(object):
 
     def __init__(self, name=None):
         self.__entries = []
+        self._name = None
         self.name = name
 
     def __len__(self):
@@ -188,7 +201,6 @@ class AccessList(object):
             self.__entries.insert(self, key, entry)
         else:
             raise TypeError('{} is not a supported type'.format(type(entry)))
-        pass
 
     def resequence(self, step=1):
         """Resequences line numbers of accesslist incrementing by step

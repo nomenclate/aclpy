@@ -1,3 +1,5 @@
+"""Provides AccessList realted objects"""
+
 from ipaddress import IPv4Address, IPv4Network
 from collections import namedtuple
 
@@ -5,7 +7,7 @@ _counter = namedtuple('counter', ['hits', 'delta'])
 
 def _string_to_ip(ipaddress):
     """Converts ip address as string to an IPv4Address (if host address)
-    or  IPv4Network (if network address) uses ipaddress from std lib
+    or IPv4Network (if network address) uses ipaddress from std lib
 
     Args:
         ipaddress (str): an IP address as a string either as a host
@@ -121,7 +123,11 @@ class Entry(object):
     # I'm cool with this
     # pylint: disable=too-many-arguments
     # I'm cool with this too
-    def __init__(self, name=None, index=None, action=None, condition=None,
+    def __init__(self,
+                 name=None,
+                 index=None,
+                 action=None,
+                 condition=None,
                  counter=None):
 
         self._name = None
@@ -137,7 +143,9 @@ class Entry(object):
             self.condition = _Condition()
         else:
             self.condition = _Condition(**condition)
-        if counter:
+        if counter is None:
+            self.counter = _counter(None, None)
+        else:
             self.counter = _counter(int(counter['hits']), counter['delta'])
 
     @property
@@ -168,7 +176,6 @@ class Entry(object):
     @action.setter
     def action(self, action):
         """Set action"""
-        #FIXME: need unit test for error
         if action in ('permit', 'deny'):
             self._action = action
         else:
@@ -184,7 +191,7 @@ class AccessList(object):
 
     Attributes:
         name (str): A string that functions as the name of the access lists.
-            Used as the name when output named access-lists """
+            Used as the name when outputing named access-lists """
 
     def __init__(self, name=None):
         self.__entries = []
@@ -207,15 +214,18 @@ class AccessList(object):
         return iter(self.__entries)
 
     def output(self):
+        """Placeholder for output method"""
         pass
 
     def append(self, entry):
+        """Appends Entry object to AccessList"""
         if isinstance(entry, Entry):
             self.__entries.append(entry)
         else:
             raise TypeError('{} is not a supported type'.format(type(entry)))
 
     def insert(self, key, entry):
+        """Inserts an Entry object after the entry indicated by key"""
         if isinstance(entry, Entry):
             self.__entries.insert(self, key, entry)
         else:
@@ -234,8 +244,8 @@ class AccessList(object):
         if step <= 0:
             raise ValueError('step must be positive non zero value')
 
-        for entry, n in zip(self, range(step, len(self)*step+step, step)):
-            entry.line = n
+        for entry, number in zip(self, range(step, len(self)*step+step, step)):
+            entry.line = number
 
     @property
     def name(self):

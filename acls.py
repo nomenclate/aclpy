@@ -150,36 +150,40 @@ class AccessList(object):
         name (str): A string that functions as the name of the access lists.
             Used as the name when output named access-lists """
 
-    def __init__(self, entries=None, name=None):
-        if entries is None:
-            self.entries = []
-        else:
-            self.entries = entries
+    def __init__(self, name=None):
+        self.__entries = []
         self.name = name
 
     def __len__(self):
-        return len(self.entries)
+        return len(self.__entries)
 
     def __getitem__(self, key):
-        return self.entries[key]
+        return self.__entries[key]
 
     def __setitem__(self, key, value):
-        self.entries[key] = value
+        self.__entries[key] = value
 
     def __delitem__(self, key):
-        del self.entries[key]
+        del self.__entries[key]
 
     def __iter__(self):
-        return iter(self.entries)
+        return iter(self.__entries)
 
     def output(self):
         pass
 
     def append(self, entry):
         if isinstance(entry, Entry):
-            self.entries.append(entry)
+            self.__entries.append(entry)
         else:
             raise TypeError('{} is not a supported type'.format(type(value)))
+
+    def insert(self, key, entry):
+        if isinstance(entry, Entry):
+            self.__entries.insert(self, key, entry)
+        else:
+            raise TypeError('{} is not a supported type'.format(type(value)))
+        pass
 
     def resequence(self, step=1):
         """Resequences line numbers of accesslist incrementing by step

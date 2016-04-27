@@ -5,13 +5,6 @@ from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
 
-_condition = namedtuple('condtion', ['protocol',
-                           'srcip',
-                           'dstip',
-                           'srcport',
-                           'dstport',
-                           'code']
-
 def string_to_ip(ipaddress):
     """Converts ip address as string to an IPv4Address (if host address)
     or IPv4Network (if network address) uses ipaddress from std lib
@@ -27,6 +20,14 @@ def string_to_ip(ipaddress):
     else:
         return IPv4Address(ipaddress)
 
+class _Protocol(object):
+    def __init__(self):
+        pass
+
+class _Port(object):
+    def __init__(self):
+        pass
+
 class _Address(object):
     def __init__(self, addresses):
         self._data = [string_to_ip(n) for n in addresses]
@@ -34,7 +35,7 @@ class _Address(object):
         return iter(self._data)
     def contains(self, matchip):
         if isinstance(matchip, IPv4Network):
-            raise ValueError
+            raise TypeError('Used IPv4Address not {}'.format(type(entry)))
         return any([(matchip in address) for address in self._data])
 
 class _Condition(object):

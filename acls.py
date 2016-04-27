@@ -4,6 +4,8 @@ from ipaddress import IPv4Address, IPv4Network
 from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
+three_tuple = namedtuple('three_tuple', ['protocol','srcip','dstip'])
+
 
 def string_to_ip(ipaddress):
     """Converts ip address as string to an IPv4Address (if host address)
@@ -20,17 +22,53 @@ def string_to_ip(ipaddress):
     else:
         return IPv4Address(ipaddress)
 
+def makecondition(three_tuple, **kwargs):
+    conditions = {
+    'protocol': _Protocol,
+     'srcip': _Address,
+     'dstip': _Address,
+     'srcport': _Port,
+     'dstport': _Port,
+    }
+
+    result = { conditions[k](v) for k, v in three_tuple.items() }
+    for key, value in kwargs.items():
+        if key in conditions.keys():
+            # does pythong have a eqiv for isinstance(thing, basestring)
+            if not isinstance(value, list):
+                value = [value]
+            result[key] = conditions[key](value)
+
+    return result
+
+
 class _Protocol(object):
-    def __init__(self):
-        pass
+    def __init__(self, protocols):
+        if protocols is None:
+            self._data = ['ip']
+        else:
+            self._data = [n for n in protocols]
+    def __iter__(self):
+        return iter(self._data)
+    def contains(self, other):
+        if not isinstance(other, _Protocol):
+            raise TypeError('{} is not _Protocol'.format(type(other)))
+        return any([(other in protocol) for protocol in self._data])
 
 class _Port(object):
-    def __init__(self):
-        pass
+    def __init__(self, ports):
+        self._data = []
+    def contains():
+        return True
+
 
 class _Address(object):
     def __init__(self, addresses):
-        self._data = [string_to_ip(n) for n in addresses]
+        if addresses is None:
+            self._data = [IPv4Network('0.0.0.0/0')]
+        else:
+            self._data = [string_to_ip(address)]
+            # self._data = [string_to_ip(n) for n in addresses]
     def __iter__(self):
         return iter(self._data)
     def contains(self, matchip):
@@ -40,20 +78,9 @@ class _Address(object):
 
 class _Condition(object):
     """A match condition for an AccessList Entry"""
-    # pylint: disable=too-many-instance-attributes
-    # I'm cool with this
-    # pylint: disable=too-many-arguments
-    # I'm cool with this too
-
-
-    def __init__(self,
-                 protocol=None,
-                 srcip=None,
-                 dstip=None,
-                 srcport=None,
-                 dstport=None,
-                 code=None):
-        pass
+    def __init__(self, protocol=None, srcip=None, dstip=None, **kwargs):
+        self.__condition = makecondition(three_tuple(protocol,scrip,dstip),
+                                         **kwargs)
 
 
 class Entry(object):

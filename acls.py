@@ -5,7 +5,14 @@ from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
 
-def _string_to_ip(ipaddress):
+_condition = namedtuple('condtion', ['protocol',
+                           'srcip',
+                           'dstip',
+                           'srcport',
+                           'dstport',
+                           'code']
+
+def string_to_ip(ipaddress):
     """Converts ip address as string to an IPv4Address (if host address)
     or IPv4Network (if network address) uses ipaddress from std lib
     Args:
@@ -20,15 +27,23 @@ def _string_to_ip(ipaddress):
     else:
         return IPv4Address(ipaddress)
 
-
+class _Address(object):
+    def __init__(self, addresses):
+        self._data = [string_to_ip(n) for n in addresses]
+    def __iter__(self):
+        return iter(self._data)
+    def contains(self, matchip):
+        if isinstance(matchip, IPv4Network):
+            raise ValueError
+        return any([(matchip in address) for address in self._data])
 
 class _Condition(object):
     """A match condition for an AccessList Entry"""
-
     # pylint: disable=too-many-instance-attributes
     # I'm cool with this
     # pylint: disable=too-many-arguments
     # I'm cool with this too
+
 
     def __init__(self,
                  protocol=None,
@@ -37,82 +52,8 @@ class _Condition(object):
                  srcport=None,
                  dstport=None,
                  code=None):
+        pass
 
-        self._protocol = None
-        self._srcip = None
-        self._dstip = None
-        self._srcport = None
-        self._dstport = None
-        self._code = None
-        if protocol is None:
-            self.protocol = 'ip'
-        else:
-            self.protocol = protocol
-        self.srcip = srcip
-        self.dstip = dstip
-        self.srcport = srcport
-        self.dstport = dstport
-        self.code = code
-
-    @property
-    def protocol(self):
-        """Get protocol of Condition"""
-        return self._protocol
-
-    @protocol.setter
-    def protocol(self, protocol):
-        """Set protocol"""
-        self._protocol = protocol
-
-    @property
-    def srcip(self):
-        """Get srcip of Condition"""
-        return self._srcip
-
-    @srcip.setter
-    def srcip(self, value):
-        """Set prototocol"""
-        self._srcip = _string_to_ip(value)
-
-    @property
-    def dstip(self):
-        """Get dstip of Condition"""
-        return self._dstip
-
-    @dstip.setter
-    def dstip(self, value):
-        """Set prototocol"""
-        self._dstip = _string_to_ip(value)
-
-    @property
-    def srcport(self):
-        """Get srcport of Condition"""
-        return self._srcport
-
-    @srcport.setter
-    def srcport(self, value):
-        """Set prototocol"""
-        self._srcport = value
-
-    @property
-    def dstport(self):
-        """Get dstport of Condition"""
-        return self._dstport
-
-    @dstport.setter
-    def dstport(self, value):
-        """Set prototocol"""
-        self._dstport = value
-
-    @property
-    def code(self):
-        """Get code of Condition"""
-        return self._code
-
-    @code.setter
-    def code(self, value):
-        """Set prototocol"""
-        self._code = value
 
 class Entry(object):
     """An Entry in an AccessList"""

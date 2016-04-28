@@ -6,23 +6,6 @@ from collections import namedtuple
 _counter = namedtuple('counter', ['hits', 'delta'])
 ThreeTuple = namedtuple('three_tuple', ['protocol', 'srcip', 'dstip'])
 
-
-def string_to_ip(ipaddress):
-    """Converts ip address as string to an IPv4Address (if host address)
-    or IPv4Network (if network address) uses ipaddress from std lib
-    Args:
-        ipaddress (str): an IP address as a string either as a host
-            address (i.e. 10.0.0.0) or as a CIDR network (i.e. 10.0.0.0/8)
-    Returns:
-        either an IPv4Address or IPv4Network depending on contents of
-            ipaddress
-    """
-    if '/' in ipaddress:
-        return IPv4Network(ipaddress)
-    else:
-        return IPv4Address(ipaddress)
-from collections import namedtuple
-
 def _makecondition(**kwargs):
     conditions = {'protocol': _Protocol,
                   'srcip': _Address,
@@ -64,9 +47,17 @@ class _Address(object):
         if addresses is None:
             self._data = [IPv4Network('0.0.0.0/0')]
         else:
-            self._data = [string_to_ip(n) for n in addresses]
+            self._data = [self.string_to_ip(n) for n in addresses]
     def __iter__(self):
         return iter(self._data)
+
+    @staticmethod
+    def string_to_ip(ipaddress):
+        if '/' in ipaddress:
+            return IPv4Network(ipaddress)
+        else:
+            return IPv4Network(ipaddress+'/32')
+
     def contains(self, matchip):
         if isinstance(matchip, IPv4Address):
             matchip = IPv4Network(matchip)

@@ -1,4 +1,4 @@
-"""Provides AccessList realted objects"""
+"""Provides AccessList related objects"""
 
 from ipaddress import IPv4Address, IPv4Network
 from collections import namedtuple
@@ -21,6 +21,7 @@ def string_to_ip(ipaddress):
         return IPv4Network(ipaddress)
     else:
         return IPv4Address(ipaddress)
+from collections import namedtuple
 
 def _makecondition(**kwargs):
     conditions = {'protocol': _Protocol,
@@ -29,15 +30,15 @@ def _makecondition(**kwargs):
                   'srcport': _Port,
                   'dstport': _Port,}
 
-    result = {}
+
+    condition = Condition()
     for key, value in kwargs.items():
         if key in conditions.keys():
-            # does pythong have a eqiv for isinstance(thing, basestring)
+            # does python have a eqiv for isinstance(thing, basestring)
             if not isinstance(value, list):
                 value = [value]
-            result[key] = conditions[key](value)
-    return result
-
+            condition[key] = conditions[key](value)
+    return condition
 
 class _Protocol(object):
     def __init__(self, protocols):
@@ -67,9 +68,42 @@ class _Address(object):
     def __iter__(self):
         return iter(self._data)
     def contains(self, matchip):
-        if isinstance(matchip, IPv4Network):
-            raise TypeError('Use IPv4Address not {}'.format(type(matchip)))
-        return any([(matchip in address) for address in self._data])
+        if isinstance(matchip, IPv4Address):
+            matchip = IPv4Network(matchip)
+        return any([(address.overlaps(matchip)) for address in self._data])
+
+class Condition(object):
+    """Container class for condition objects"""
+    conditions = {'protocol': _Protocol,
+                  'srcip': _Address,
+                  'dstip': _Address,
+                  'srcport': _Port,
+                  'dstport': _Port}
+
+    def __init__(self):
+        self.__data = {}
+
+    def __setitem__(self, key, value):
+        self.__data[key] = value
+
+    def __getitem__(self, key):
+        return self.__data[key]
+
+    def __delitem__(self, key):
+        del self.__data[key]
+
+    def __iter__(self):
+        return iter(self.__data)
+
+    @classmethod
+    def condition(cls, **kwargs):
+        condition = Condition()
+        for key, value in kwargs.items():
+            if key in cls.conditions.keys():
+                if not isinstance(value, list):
+                    value = [value]
+                condition[key] = cls.conditions[key](value)
+        return condition
 
 class Entry(object):
     """An Entry in an AccessList"""
@@ -94,7 +128,7 @@ class Entry(object):
             self.__data['action'] = 'permit'
         else:
             self.__data['action'] = action
-        self.__data['condition'] = _makecondition(**condition)
+        self.__data['condition'] = Condition.condition(**condition)
         if counter is None:
             self.__data['counter'] = counter
         else:
@@ -124,8 +158,13 @@ class Entry(object):
 
     @property
     def action(self):
-        """Get action of Condition"""
+        """Get action"""
         return self.__getitem__('action')
+
+    @property
+    def condition(self):
+        """Get condition"""
+        return self.__getitem__('condition')
 
     @property
     def hits(self):
@@ -167,11 +206,14 @@ class AccessList(object):
     def __iter__(self):
         return iter(self.__entries)
 
+    def ismatch(self, match):
+        return self.condition == match
+
     def output(self):
         """Placeholder for output method"""
         pass
 
-    def entry(self, **kwargs):
+    def create_entry(self, **kwargs):
         self.append(Entry(**kwargs))
 
     def append(self, entry):

@@ -14,7 +14,7 @@ def test_name():
 
     parsedacl = AccessList(name=result['name'])
     for entry in result['entry']:
-        parsedacl.entry(index=entry['index'],
+        parsedacl.create_entry(index=entry['index'],
                         action=entry['action'],
                         condition=entry['condition'],
                         counter=entry['counter'])

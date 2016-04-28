@@ -4,7 +4,7 @@ from ipaddress import IPv4Address, IPv4Network
 from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
-three_tuple = namedtuple('three_tuple', ['protocol','srcip','dstip'])
+ThreeTuple = namedtuple('three_tuple', ['protocol', 'srcip', 'dstip'])
 
 
 def string_to_ip(ipaddress):
@@ -23,13 +23,11 @@ def string_to_ip(ipaddress):
         return IPv4Address(ipaddress)
 
 def _makecondition(**kwargs):
-    conditions = {
-    'protocol': _Protocol,
-     'srcip': _Address,
-     'dstip': _Address,
-     'srcport': _Port,
-     'dstport': _Port,
-    }
+    conditions = {'protocol': _Protocol,
+                  'srcip': _Address,
+                  'dstip': _Address,
+                  'srcport': _Port,
+                  'dstport': _Port,}
 
     result = {}
     for key, value in kwargs.items():
@@ -60,7 +58,6 @@ class _Port(object):
     def contains():
         return True
 
-
 class _Address(object):
     def __init__(self, addresses):
         if addresses is None:
@@ -71,7 +68,7 @@ class _Address(object):
         return iter(self._data)
     def contains(self, matchip):
         if isinstance(matchip, IPv4Network):
-            raise TypeError('Used IPv4Address not {}'.format(type(entry)))
+            raise TypeError('Use IPv4Address not {}'.format(type(matchip)))
         return any([(matchip in address) for address in self._data])
 
 class _Condition(object):
@@ -105,6 +102,13 @@ class Entry(object):
                  condition=None,
                  counter=None):
 
+        self.__data =  {}
+        self.__data['name']=name
+        self.__data['index']=index
+        self.__data['action']=action
+
+
+
         self._name = None
         self.name = name
         self._index = None
@@ -118,10 +122,24 @@ class Entry(object):
             self.condition = _Condition()
         else:
             self.condition = _Condition(**condition)
+            self.__data['condition']=_makecondition(**condition)
         if counter is None:
             self.counter = _counter(None, None)
         else:
             self.counter = _counter(int(counter['hits']), counter['delta'])
+            self.__data['counter']=_counter(int(counter['hits']), counter['delta'])
+
+    def __getitem__(self, key):
+        return self.__data[key]
+
+    def __setitem__(self, key, value):
+        self.__data[key] = value
+
+    def __delitem__(self, key):
+        del self.__data[key]
+
+    def __iter__(self):
+        return iter(self.__data)
 
     @property
     def name(self):
@@ -190,6 +208,9 @@ class AccessList(object):
     def output(self):
         """Placeholder for output method"""
         pass
+
+    def entry(self, **kwargs):
+        self.append(Entry(**kwargs))
 
     def append(self, entry):
         """Appends Entry object to AccessList"""

@@ -14,11 +14,10 @@ def test_name():
 
     parsedacl = AccessList(name=result['name'])
     for entry in result['entry']:
-        parsedacl.append(Entry(index=entry['index'],
-                               action=entry['action'],
-                               condition=entry['condition'],
-                               counter=entry['counter']
-                               ))
+        parsedacl.entry(index=entry['index'],
+                        action=entry['action'],
+                        condition=entry['condition'],
+                        counter=entry['counter'])
 
     name = 'THIS_IS_A_NAME'
 

@@ -36,15 +36,26 @@ class _Address(object):
 
     @staticmethod
     def string_to_ip(ipaddress):
+        """Converts ip address as string to an IPv4Address (if host address)
+    or IPv4Network (if network address) uses ipaddress from std lib
+    Args:
+        ipaddress (str): an IP address as a string either as a host
+            address (i.e. 10.0.0.0) or as a CIDR network (i.e. 10.0.0.0/8)
+    Returns:
+        IPv4Network(object)
+    """
         if '/' in ipaddress:
             return IPv4Network(ipaddress)
         else:
             return IPv4Network(ipaddress+'/32')
 
     def contains(self, matchip):
-        if isinstance(matchip, IPv4Address):
-            matchip = IPv4Network(matchip)
-        return any([(address.overlaps(matchip)) for address in self._data])
+        """Comapares two isntances of _Address class to determine if they
+        overlap"""
+        if isinstance(matchip, IPv4Network):
+            return any([(address.overlaps(matchip)) for address in self._data])
+        else:
+            raise TypeError('{} is not IPv4Network')
 
 class Condition(object):
     """Container class for condition objects"""

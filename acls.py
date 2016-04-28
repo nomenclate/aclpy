@@ -71,30 +71,11 @@ class _Address(object):
             raise TypeError('Use IPv4Address not {}'.format(type(matchip)))
         return any([(matchip in address) for address in self._data])
 
-class _Condition(object):
-    """A match condition for an AccessList Entry"""
-    def __init__(self, **kwargs):
-        self.__condition = _makecondition(**kwargs)
-
-    def __getitem__(self, key):
-        return self.__condition[key]
-
-    def __setitem__(self, key, value):
-        self.__condition[key] = value
-
-    def __delitem__(self, key):
-        del self.__condition[key]
-
-    def __iter__(self):
-        return iter(self.__condition)
-
 class Entry(object):
     """An Entry in an AccessList"""
 
-    # pylint: disable=too-many-instance-attributes
-    # I'm cool with this
     # pylint: disable=too-many-arguments
-    # I'm cool with this too
+    # I'm cool with this
     def __init__(self,
                  name=None,
                  index=None,
@@ -102,32 +83,22 @@ class Entry(object):
                  condition=None,
                  counter=None):
 
-        self.__data =  {}
-        self.__data['name']=name
-        self.__data['index']=index
-        self.__data['action']=action
-
-
-
-        self._name = None
-        self.name = name
-        self._index = None
-        self.index = index
-        self._action = None
+        self.__data = {}
+        self.__data['name'] = name
+        if index is None:
+            self.__data['index'] = index
+        else:
+            self.__data['index'] = int(index)
+        self.__data['action'] = action
         if action is None:
-            self.action = 'permit'
+            self.__data['action'] = 'permit'
         else:
-            self.action = action
-        if condition is None:
-            self.condition = _Condition()
-        else:
-            self.condition = _Condition(**condition)
-            self.__data['condition']=_makecondition(**condition)
+            self.__data['action'] = action
+        self.__data['condition'] = _makecondition(**condition)
         if counter is None:
-            self.counter = _counter(None, None)
+            self.__data['counter'] = counter
         else:
-            self.counter = _counter(int(counter['hits']), counter['delta'])
-            self.__data['counter']=_counter(int(counter['hits']), counter['delta'])
+            self.__data['counter'] = counter
 
     def __getitem__(self, key):
         return self.__data[key]
@@ -144,40 +115,31 @@ class Entry(object):
     @property
     def name(self):
         """Get name of Condition"""
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        """Set Name"""
-        self._name = value
+        return self.__getitem__('name')
 
     @property
     def index(self):
         """Get index of Condition"""
-        return self._index
-
-    @index.setter
-    def index(self, value):
-        """Set index"""
-        self._index = value
+        return self.__getitem__('index')
 
     @property
     def action(self):
         """Get action of Condition"""
-        return self._action
+        return self.__getitem__('action')
 
-    @action.setter
-    def action(self, action):
-        """Set action"""
-        if action in ('permit', 'deny'):
-            self._action = action
-        else:
-            raise NotImplementedError('action {} not implemented'.format(action))
+    @property
+    def hits(self):
+        """Get hits"""
+        return self.__getitem__('counter')['hits']
+
+    @property
+    def delta(self):
+        """Get delta"""
+        return self.__getitem__('counter')['delta']
 
     def check_for_match(self, arg):
         """Checks for matches agasint Conditions in AccessList"""
         pass
-
 
 class AccessList(object):
     """a List like object for interacting with access lists

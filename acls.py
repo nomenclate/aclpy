@@ -6,23 +6,6 @@ from collections import namedtuple
 _counter = namedtuple('counter', ['hits', 'delta'])
 ThreeTuple = namedtuple('three_tuple', ['protocol', 'srcip', 'dstip'])
 
-def _makecondition(**kwargs):
-    conditions = {'protocol': _Protocol,
-                  'srcip': _Address,
-                  'dstip': _Address,
-                  'srcport': _Port,
-                  'dstport': _Port,}
-
-
-    condition = Condition()
-    for key, value in kwargs.items():
-        if key in conditions.keys():
-            # does python have a eqiv for isinstance(thing, basestring)
-            if not isinstance(value, list):
-                value = [value]
-            condition[key] = conditions[key](value)
-    return condition
-
 class _Protocol(object):
     def __init__(self, protocols):
         if protocols is None:

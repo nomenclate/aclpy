@@ -1,10 +1,9 @@
 """Provides AccessList related objects"""
 
-from ipaddress import IPv4Address, IPv4Network
+from ipaddress import IPv4Network
 from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
-ThreeTuple = namedtuple('three_tuple', ['protocol', 'srcip', 'dstip'])
 
 class _Protocol(object):
     def __init__(self, protocols):
@@ -12,8 +11,13 @@ class _Protocol(object):
             self._data = ['ip']
         else:
             self._data = [n for n in protocols]
+
     def __iter__(self):
         return iter(self._data)
+
+    def __repr__(self):
+        return repr(self._data)
+
     def contains(self, other):
         if not isinstance(other, _Protocol):
             raise TypeError('{} is not _Protocol'.format(type(other)))
@@ -21,9 +25,16 @@ class _Protocol(object):
 
 class _Port(object):
     def __init__(self, ports):
-        self._data = []
-    def contains():
-        return True
+        if ports is None:
+            self._data = []
+        else:
+            self._data = ports
+
+    def __repr__(self):
+        return repr(self._data)
+
+    def contains(self, other):
+        return any([True])
 
 class _Address(object):
     def __init__(self, addresses):
@@ -33,6 +44,10 @@ class _Address(object):
             self._data = [self.string_to_ip(n) for n in addresses]
     def __iter__(self):
         return iter(self._data)
+
+    def __repr__(self):
+        return repr(self._data)
+
 
     @staticmethod
     def string_to_ip(ipaddress):
@@ -78,7 +93,10 @@ class Condition(object):
         del self.__data[key]
 
     def __iter__(self):
-        return iter(self.__data)
+        return iter(self.__data.items())
+
+    def __repr__(self):
+        return repr(self.__data)
 
     @classmethod
     def condition(cls, **kwargs):

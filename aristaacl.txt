@@ -1,10 +1,10 @@
 IP Access List THIS_IS_A_NAME
         statistics per-entry
-        10 permit udp any any eq bootps bootpc [match 10551, 0:11:57 ago]
+        10 permit udp any any eq 67 68 [match 10551, 0:11:57 ago]
         20 permit udp 10.10.28.0/23 host 10.10.200.11 eq domain [match 967497, 0:00:00 ago]
         30 permit udp 10.10.28.0/23 host 10.10.200.12 eq domain [match 560332, 0:00:59 ago]
         40 permit tcp 10.10.28.0/23 host 10.30.200.12 eq domain
-        50 permit udp 10.10.28.0/23 host 10.48.0.9 eq ntp [match 73751, 0:00:00 ago]
+        50 permit udp 10.10.28.0/23 host 10.48.0.9 eq 123 [match 73751, 0:00:00 ago]
         60 permit tcp 10.10.28.0/23 host 10.10.200.82 eq ftp [match 4, 48 days, 18:10:58 ago]
         70 permit tcp 10.10.28.0/23 gt 1023 host 10.10.200.82 eq ftp-data
         80 permit tcp 10.10.28.0/23 eq 2000 host 131.107.218.50 range 8000 8086
@@ -13,4 +13,4 @@ IP Access List THIS_IS_A_NAME
         95 permit tcp 10.10.28.0/23 neq 1024 host 131.107.218.155 eq https
         96 permit 1 host 10.10.0.1 any
         100 deny ip any any [match 151250, 0:08:53 ago]
-        110 permit udp any gt 1024 any eq bootps bootpc [match 10551, 0:11:57 ago]
+        110 permit udp any gt 1024 any eq 67 68 [match 10551, 0:11:57 ago]

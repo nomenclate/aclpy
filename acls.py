@@ -369,6 +369,10 @@ class Entry(object):
     def __iter__(self):
         return iter(self.__data)
 
+    def __contains__(self, key):
+        print('in contains')
+        return key in self.__data.keys()
+
     @property
     def name(self):
         """Get name of Condition"""
@@ -392,7 +396,10 @@ class Entry(object):
     @property
     def hits(self):
         """Get hits"""
-        return self.__getitem__('counter')['hits']
+        if self.__getitem__('counter')['hits']
+            return self.__getitem__('counter')['hits']
+        else:
+            return None
 
     @property
     def delta(self):

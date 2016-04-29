@@ -28,7 +28,7 @@ cidrmask = pp.Word(pp.nums, max=2)
 ipaddr = pp.Combine(ipoctet + (dot + ipoctet) * 3, joinString='.')
 
 name = pp.Combine((pp.Literal('IP Access List ').suppress()) +
-                  pp.Word(pp.alphas+'_-'))
+                  pp.Word(pp.alphanums+'_-'))
 
 hostip = (host.suppress() + ipaddr).setParseAction(token_to_ip('host'))
 net = pp.Combine(ipaddr +

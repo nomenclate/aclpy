@@ -20,7 +20,10 @@ class _Protocol(object):
 
     def contains(self, other):
         for item in other:
-            return any([(item in n) for n in self._data])
+            if self._data == ['ip']:
+                return True
+            else:
+                return any([(item in n) for n in self])
 
 class _Port(object):
     portnames = {
@@ -236,11 +239,11 @@ class _Port(object):
 
     # TODO: This Needs to be cleaned up
     def contains(self, other):
-        for portobject in other:
-            for otherport in portobject['port']:
-                for myport in self._data:
+        for portobj in [ port for port in other ]:
+            for otherport in portobj['port']:
+                for myport in self:
                     if myport['portop'] == 'eq':
-                        return any(otherport == n for n in myport['port'])
+                        return any([otherport == n for n in myport['port']])
                     elif myport['portop'] == 'range':
                         return myport['port'][0] <= otherport <= myport['port'][1]
                     elif myport['portop'] == 'gt':
@@ -283,7 +286,7 @@ class _Address(object):
             overlap"""
         for item in matchip:
             if isinstance(item, IPv4Network):
-                return any([address.overlaps(item) for address in self._data])
+                return any([address.overlaps(item) for address in self])
             else:
                 raise TypeError('{} is not IPv4Network'.format)
 
@@ -314,7 +317,7 @@ class Condition(object):
         return repr(self.__data)
 
     def contains(self, other):
-        return all([self.__data[k].contains(other[k]) for k, v in self.__iter__()])
+        return all([self[k].contains(other[k]) for k, v in self])
 
 
 
@@ -372,27 +375,30 @@ class Entry(object):
     @property
     def name(self):
         """Get name of Condition"""
-        return self.__getitem__('name')
+        return self['name']
 
     @property
     def index(self):
         """Get index of Condition"""
-        return self.__getitem__('index')
+        return self['index']
 
     @property
     def action(self):
         """Get action"""
-        return self.__getitem__('action')
+        return self['action']
 
     @property
     def condition(self):
         """Get condition"""
-        return self.__getitem__('condition')
+        return self['condition']
 
     @property
     def hits(self):
         """Get hits"""
-        return self.__getitem__('counter')['hits']
+        if self['counter']:
+            return self['counter']['hits']
+        else:
+            return None
 
     @property
     def delta(self):

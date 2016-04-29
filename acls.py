@@ -242,6 +242,7 @@ class _Port(object):
         else:
             return int(name)
 
+    # TODO: This Needs to be cleaned up
     def contains(self, other):
         for portobject in other:
             for otherport in portobject['port']:

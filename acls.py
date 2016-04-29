@@ -243,19 +243,19 @@ class _Port(object):
             return int(name)
 
     def contains(self, other):
-        for ports in other:
-            for port in ports['port']:
-                for thing in self._data:
-                    if thing['portop'] == 'eq':
-                        return any(port == n for n in thing['port'])
-                    elif thing['portop'] == 'range':
-                        return (thing['port'][0] <= port <= thing['port'][1])
-                    elif thing['portop'] == 'gt':
-                        return (port > thing['port'][0])
-                    elif thing['portop'] == 'lt':
-                        return (port > thing['port'][0])
-                    elif thing['portop'] == 'neq':
-                        return (port != thing['port'][0])
+        for portobject in other:
+            for otherport in portobject['port']:
+                for myport in self._data:
+                    if myport['portop'] == 'eq':
+                        return any(otherport == n for n in myport['port'])
+                    elif myport['portop'] == 'range':
+                        return (myport['port'][0] <= otherport <= myport['port'][1])
+                    elif myport['portop'] == 'gt':
+                        return (otherport > myport['port'][0])
+                    elif myport['portop'] == 'lt':
+                        return (otherport > myport['port'][0])
+                    elif myport['portop'] == 'neq':
+                        return (otherport != myport['port'][0])
 
 class _Address(object):
     def __init__(self, addresses):

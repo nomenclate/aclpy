@@ -1,128 +1,338 @@
-"""Provides AccessList realted objects"""
+"""Provides AccessList related objects"""
 
-from ipaddress import IPv4Address, IPv4Network
+from ipaddress import IPv4Network
 from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
 
-def _string_to_ip(ipaddress):
-    """Converts ip address as string to an IPv4Address (if host address)
-    or IPv4Network (if network address) uses ipaddress from std lib
+class _Protocol(object):
+    def __init__(self, protocols):
+        if protocols is None:
+            self._data = ['ip']
+        else:
+            self._data = [n for n in protocols]
 
-    Args:
-        ipaddress (str): an IP address as a string either as a host
+    def __iter__(self):
+        return iter(self._data)
+
+    def __repr__(self):
+        return repr(self._data)
+
+    def contains(self, other):
+        for item in other:
+            return any([(item in n) for n in self._data])
+
+class _Port(object):
+    portnames = {
+        ### TCP ports start here
+        'acap':674,#Application Configuration Access Protocol
+        'acr-nema':104,#ACR-NEMA Digital Imaging and Communications in Medicine
+        'afpovertcp':548,#Apple Filing Protocol Over TCP
+        'arns':384,#A Remote Network Server System
+        'asip-webadmin':311,#AppleShare IP Web Administration
+        'at-rtmp':201,#AppleTalk Routing Maintenance
+        'aurp':387,#Appletalk Update-Based Routing Protocol
+        'bftp':152,#Background File Transfer Program
+        'bgmp':264,#Border Gateway Multicast Protocol
+        'bgp':179,#Border Gateway Protocol
+        'chargen':19,#Character Generator
+        'cisco-tdp':711,#Cisco Tag Distribution Protocol
+        'citadel':504,#Citadel
+        'clearcase':371,#Clearcase albd
+        'cmd':514,#Remote Shell/Rsh
+        'commerce':542,#Commerce Applications
+        'courier':530,#Remote Procedure Call
+        'csnet-ns':105,#CCSO Name Server Protocol
+        'daytime':13,#Daytime
+        'dhcp-failover2':847,#DHCP Failover Protocol
+        'dhcpv6-client':546,#DHCPv6 Client
+        'dhcpv6-server':547,#DHCPv6 Server
+        'discard':9,#Discard
+        'domain':53,#Domain Name Service
+        'dsp':33,#Display Support Protocol
+        'echo':7,#Echo
+        'efs':520,#Extended File Name Server
+        'epp':700,#Extensible Provision Protocol
+        'esro-gen':259,#Efficient Short Remote Operations
+        'exec':512,#Remote Process Execution/Rexec
+        'finger':79,#Finger
+        'ftp':21,#File Transfer Protocol
+        'ftp-data':20,#FTP data connections
+        'ftps':990,#FTPS Protocol (control)
+        'ftps-data':989,#FTPS Protocol (data)
+        'godi':848,#Group Domain of Interpretation Protocol
+        'gopher':70,#Gopher
+        'gre':47,#Generic Routing Encapsulation
+        'ha-cluster':694,#Linux-HA Heartbeat
+        'hostname':101,#NIC hostname server
+        'hp-alarm-mgr':383,#HP Performance Data Alarm Manager
+        'http-alt':591,#Filemaker, Inc. -HTTP Alternate
+        'http-mgmt':280,#http-mgmt
+        'http-rpc-epmap':593,#HTTP RPC Ep Map
+        'https':443,#HTTP Secure (HTTPS)
+        'ident':113,#Ident Protocol
+        'ieee-mms-ssl':695,#IEEE Media Management System Over SSL
+        'imap':143,#Interim Mail Access Protocol
+        'imap3':220,#Interactive Mail Access Protocol v3
+        'imaps':993,#Internet Message Access Protocol over SSL
+        'ipp':631,#Internet Printing Protocol
+        'ipx':213,#Internetwork Packet Exchange
+        'irc':194,#Internet Relay Chat
+        'iris-beep':702,#Internet Registry Information Service Over BEEP
+        'iscsi':860,#Internet Small Computers Systems Interface
+        'isi-gl':55,#ISI Graphics Language
+        'iso-tsap':102,#ISO-TSAP Class 0
+        'kerberos':88,#Kerberos Authentication System
+        'kerberos-adm':749,#Kerberos Administration
+        'klogin':543,#Kerberos login
+        'kpasswd':464,#Kerberos Change/Set Password
+        'kshell':544,#Kerberos shell
+        'la-maint':51,#IMP Logical Address Maintenance
+        'lanz':50001,#Lanz Streaming
+        'ldap':389,#Lightweight Directory Access Protocol
+        'ldaps':636,#LDAP Over TLS/SSH
+        'lmp':701,#Link Management Protocol
+        'login':513,#Rlogin
+        'lpd':515,#Line Printer Daemon
+        'mac-srvr-admin':660,#MacOS Server Admin
+        'matip-type-a':350,#MATIP Type A
+        'matip-type-b':351,#MATIP Type B
+        'microsoft-ds':445,#Microsoft-DS SMB File Sharing
+        'mlag':4432,#MLAG Protocol
+        'mpp':218,#Netix Message Posting Protocol
+        'ms-sql-m':1434,#Microsoft SQL Monitor
+        'ms-sql-s':1433,#Microsoft SQL Server
+        'msdp':639,#Multicast Source Discovery Protocol
+        'msexch-routing':691,#MS Exchange Routing
+        'msg-icp':29,#MSG ICP
+        'msp':18,#Message Send Protocol
+        'nas':991,#Netnews Administration System
+        'ncp':524,#NetWare Core Protocol
+        'netrjs-1':71,#Remote Job Service
+        'netrjs-2':72,#Remote Job Service
+        'netrjs-3':73,#Remote Job Service
+        'netrjs-4':74,#Remote Job Service
+        'netwnews':532,#Readnews
+        'new-rwho':550,#new-who
+        'nfs':2049,#Network File System
+        'nntp':119,#Network News Transport Protocol
+        'nntps':563,#Network News Transfer Protocol Over TSL/SSH
+        'nsw-fe':27,#NSW User System FE
+        'odmr':366,#On Demand Mail Retry
+        'openvpn':1194,#OpenVPN
+        'pim-auto-rp':496,#PIM Auto-RP
+        'pkix-timestamp':318,#PKIX Timestamp
+        'pkt-krb-ipsec':1293,#Internet Protocol Security
+        'pop2':109,#Post Office Protocol v2
+        'pop3':110,#Post Office Protocol v3
+        'pop3s':995,#Post Office Protocol 3 over TLS/SSL
+        'pptp':1723,#Microsoft Point-to-Point Tunneling Protocol
+        'print-srv':170,#Network PostScript
+        'ptp-event':319,#Precision Time Protocol Event
+        'ptp-general':320,#Precision Time Protocol General
+        'qmtp':209,#The Quick Mail Transfer Protocol
+        'qotd':17,#Quote of the Day
+        'radius':1812,#Radius Authentication Protocol
+        'radius-acct':1813,#Radius Accounting Protocol
+        're-mail-ck':50,#Remote Mail Checking Protocol
+        'remotefs':556,#RFS Server
+        'repcmd':641,#SupportSoft Nexus Remote Command
+        'rje':5,#Remote Job Entry
+        'rlp':39,#Resource Location Protocol
+        'rlzdbase':635,#RLZ DBase
+        'rmc':657,#Remote Monitoring and Control Protocol
+        'rpc2portmap':369,#Rpc2portmap
+        'rsync':873,#rysnc File Synchronization Protocol
+        'rtelnet':107,#Remote Telnet Service
+        'rtsp':554,#Real Time Streaming Protocol
+        'sgmp':153,#Simple Gateway Monitoring Protocol
+        'silc':706,#Secure Internet Live Conferencing
+        'smtp':25,#Simple Mail Transport Protocol
+        'smux':199,#SNMP Unix Multiplexer
+        'snagas':108,#SNA Gateway Access Server
+        'snmp':161,#Simple Network Management Protocol
+        'snmptrap':162,#SNMP Traps
+        'snpp':444,#Simple Network Paging Protocol
+        'sqlserv':118,#SQL Services
+        'sqlsrv':156,#SQL Service
+        'ssh':22,#Secure Shell Protocol
+        'submission':587,#Email Message Submission
+        'sunrpc':111,#Sun Remote Procedure Call
+        'svrloc':427,#Server Location Protocol
+        'systat':11,#Active users
+        'tacacs':49,#TAC Access Control System
+        'talk':517,#Talk
+        'tbrpf':712,#Topology Broadcast based on Reverse-Path Forwarding Protocol
+        'tcpmux':1,#TCP Port Service Multiplexer
+        'tcpnethaspsrv':475,#Aladdin Knowledge Systems Hasp services, TCP/IP version
+        'telnet':23,#Telnet Protocol
+        'time':37,#Time
+        'tunnel':604,#TUNNEL Profile
+        'ups':401,#Uninterruptible Power Supply
+        'uucp':540,#Unix-to-Unix Copy Program
+        'uucp-path':117,#UUCP Path Service
+        'vmnet':175,#VMNET
+        'whois':43,#Nicname
+        'www':80,#World Wide Web (HTTP)
+        'xns-ch':54,#XNS (Xerox Network Systems) Clearinghouse
+        'xns-mail':58,#XNS (Xerox Network Systems) Mail
+        'xns-time':52,#XNS (Xerox Network Systems) Time Protocol
+        'z39-50':210, #ANSI Z39.50
+        ### UDP ports start here
+        'asf-rmcp':623,  #ASF Remote Management and Control Protocol
+        'auth':113,  #Authentication Service
+        'bfd':3784,  #Bidirectional Forwarding Detection
+        'bfd-echo':3785,  #BFD Echo
+        'biff':512,  #Biff (mail notification, comsat)
+        'bootpc':68,  #Bootstrap Protocol (BOOTP) client
+        'bootps':67,  #Bootstrap Protocol (BOOTP) server
+        'dnsix':195,  #DNSIX security protocol auditing
+        'gtp-c':2123,  #GPRS Tunneling Protocol Control Data
+        'gtp-prime':3386,  #GPRS Tunneling Prime Protocol
+        'gtp-u':2152,  #GPRS Tunneling Protocol User Data
+        'isakmp':500,  #Internet Security Association and Key Management Protocol
+        'l2tp':1701,  #Layer 2 Tunneling Protocol
+        'mobile-ip':434,  #Mobile IP registration
+        'monitor':561,  #Monitord
+        'nameserver':42,  #IEN116 Nameserver Service (obsolete)
+        'netbios-dgm':138,  #NetBios datagram service
+        'netbios-ns':137,  #NetBios name service
+        'netbios-ss':139,  #NetBios session service
+        'netwall':533,  #For Emergency Broadcasts
+        'non500-isakmp':4500,  #Internet Security Association and Key Management Protocol
+        'ntp':123,  #Network Time Protocol
+        'olsr':698,  #Optimized Link State Routing
+        'rip':520,  #Routing Information Protocol
+        'rmonitor':560,  #Remote Monitord
+        'syslog':514,  #System Logger
+        'tftp':69,  #Trivial File Transfer Protocol
+        'timed':525,  #Timeserver
+        'who':513,  #Who service, rwho
+        'xdmcp':177,  #X Display Manager Control Protocol
+    }
+
+    def __init__(self, ports):
+        if ports is None:
+            self._data = []
+        else:
+            self._data = []
+            for port in ports:
+                port['port'] = [_Port.name_to_port(n) for n in port['port']]
+                self._data.append(port)
+
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __repr__(self):
+        return repr(self._data)
+
+    @classmethod
+    def name_to_port(cls, name):
+        if name in cls.portnames.keys():
+            return cls.portnames[name]
+        else:
+            return int(name)
+
+    # TODO: This Needs to be cleaned up
+    def contains(self, other):
+        for portobject in other:
+            for otherport in portobject['port']:
+                for myport in self._data:
+                    if myport['portop'] == 'eq':
+                        return any(otherport == n for n in myport['port'])
+                    elif myport['portop'] == 'range':
+                        return myport['port'][0] <= otherport <= myport['port'][1]
+                    elif myport['portop'] == 'gt':
+                        return otherport > myport['port'][0]
+                    elif myport['portop'] == 'lt':
+                        return otherport > myport['port'][0]
+                    elif myport['portop'] == 'neq':
+                        return otherport != myport['port'][0]
+
+class _Address(object):
+    def __init__(self, addresses):
+        if addresses is None:
+            self._data = [IPv4Network('0.0.0.0/0')]
+        else:
+            self._data = [self.string_to_ip(n) for n in addresses]
+    def __iter__(self):
+        return iter(self._data)
+
+    def __repr__(self):
+        return repr(self._data)
+
+
+    @staticmethod
+    def string_to_ip(ipaddress):
+        """Converts ip address passed as a string to an IPv4Network
+
+        Args:
+            ipaddress(str): an IP address as a string either as a host
             address (i.e. 10.0.0.0) or as a CIDR network (i.e. 10.0.0.0/8)
 
-    Returns:
-        either an IPv4Address or IPv4Network depending on contents of
-            ipaddress
-    """
-    if '/' in ipaddress:
-        return IPv4Network(ipaddress)
-    else:
-        return IPv4Address(ipaddress)
-
-
-
-class _Condition(object):
-    """A match condition for an AccessList Entry"""
-
-    # pylint: disable=too-many-instance-attributes
-    # I'm cool with this
-    # pylint: disable=too-many-arguments
-    # I'm cool with this too
-
-    def __init__(self,
-                 protocol=None,
-                 srcip=None,
-                 dstip=None,
-                 srcport=None,
-                 dstport=None,
-                 code=None):
-
-        self._protocol = None
-        self._srcip = None
-        self._dstip = None
-        self._srcport = None
-        self._dstport = None
-        self._code = None
-        if protocol is None:
-            self.protocol = 'ip'
+        Returns:
+            IPv4Network(object)"""
+        if '/' in ipaddress:
+            return IPv4Network(ipaddress)
         else:
-            self.protocol = protocol
-        self.srcip = srcip
-        self.dstip = dstip
-        self.srcport = srcport
-        self.dstport = dstport
-        self.code = code
+            return IPv4Network(ipaddress+'/32')
 
-    @property
-    def protocol(self):
-        """Get protocol of Condition"""
-        return self._protocol
+    def contains(self, matchip):
+        """Comapares two isntances of _Address class to determine if they
+            overlap"""
+        for item in matchip:
+            if isinstance(item, IPv4Network):
+                return any([address.overlaps(item) for address in self._data])
+            else:
+                raise TypeError('{} is not IPv4Network'.format)
 
-    @protocol.setter
-    def protocol(self, protocol):
-        """Set protocol"""
-        self._protocol = protocol
+class Condition(object):
+    """Container class for condition objects"""
+    conditions = {'protocol': _Protocol,
+                  'srcip': _Address,
+                  'dstip': _Address,
+                  'srcport': _Port,
+                  'dstport': _Port}
 
-    @property
-    def srcip(self):
-        """Get srcip of Condition"""
-        return self._srcip
+    def __init__(self):
+        self.__data = {}
 
-    @srcip.setter
-    def srcip(self, value):
-        """Set prototocol"""
-        self._srcip = _string_to_ip(value)
+    def __setitem__(self, key, value):
+        self.__data[key] = value
 
-    @property
-    def dstip(self):
-        """Get dstip of Condition"""
-        return self._dstip
+    def __getitem__(self, key):
+        return self.__data[key]
 
-    @dstip.setter
-    def dstip(self, value):
-        """Set prototocol"""
-        self._dstip = _string_to_ip(value)
+    def __delitem__(self, key):
+        del self.__data[key]
 
-    @property
-    def srcport(self):
-        """Get srcport of Condition"""
-        return self._srcport
+    def __iter__(self):
+        return iter(self.__data.items())
 
-    @srcport.setter
-    def srcport(self, value):
-        """Set prototocol"""
-        self._srcport = value
+    def __repr__(self):
+        return repr(self.__data)
 
-    @property
-    def dstport(self):
-        """Get dstport of Condition"""
-        return self._dstport
+    def contains(self, other):
+        return all([self.__data[k].contains(other[k]) for k, v in self.__iter__()])
 
-    @dstport.setter
-    def dstport(self, value):
-        """Set prototocol"""
-        self._dstport = value
 
-    @property
-    def code(self):
-        """Get code of Condition"""
-        return self._code
 
-    @code.setter
-    def code(self, value):
-        """Set prototocol"""
-        self._code = value
+    @classmethod
+    def condition(cls, **kwargs):
+        condition = Condition()
+        for key, value in kwargs.items():
+            if key in cls.conditions.keys():
+                if not isinstance(value, list):
+                    value = [value]
+                condition[key] = cls.conditions[key](value)
+        return condition
 
 class Entry(object):
     """An Entry in an AccessList"""
 
-    # pylint: disable=too-many-instance-attributes
-    # I'm cool with this
     # pylint: disable=too-many-arguments
-    # I'm cool with this too
+    # I'm cool with this
     def __init__(self,
                  name=None,
                  index=None,
@@ -130,65 +340,71 @@ class Entry(object):
                  condition=None,
                  counter=None):
 
-        self._name = None
-        self.name = name
-        self._index = None
-        self.index = index
-        self._action = None
+        self.__data = {}
+        self.__data['name'] = name
+        if index is None:
+            self.__data['index'] = index
+        else:
+            self.__data['index'] = int(index)
+        self.__data['action'] = action
         if action is None:
-            self.action = 'permit'
+            self.__data['action'] = 'permit'
         else:
-            self.action = action
-        if condition is None:
-            self.condition = _Condition()
-        else:
-            self.condition = _Condition(**condition)
+            self.__data['action'] = action
+        self.__data['condition'] = Condition.condition(**condition)
         if counter is None:
-            self.counter = _counter(None, None)
+            self.__data['counter'] = counter
         else:
-            self.counter = _counter(int(counter['hits']), counter['delta'])
+            self.__data['counter'] = counter
+
+    def __getitem__(self, key):
+        return self.__data[key]
+
+    def __setitem__(self, key, value):
+        self.__data[key] = value
+
+    def __delitem__(self, key):
+        del self.__data[key]
+
+    def __iter__(self):
+        return iter(self.__data)
 
     @property
     def name(self):
         """Get name of Condition"""
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        """Set Name"""
-        self._name = value
+        return self.__getitem__('name')
 
     @property
     def index(self):
         """Get index of Condition"""
-        return self._index
-
-    @index.setter
-    def index(self, value):
-        """Set index"""
-        self._index = value
+        return self.__getitem__('index')
 
     @property
     def action(self):
-        """Get action of Condition"""
-        return self._action
+        """Get action"""
+        return self.__getitem__('action')
 
-    @action.setter
-    def action(self, action):
-        """Set action"""
-        if action in ('permit', 'deny'):
-            self._action = action
-        else:
-            raise NotImplementedError('action {} not implemented'.format(action))
+    @property
+    def condition(self):
+        """Get condition"""
+        return self.__getitem__('condition')
+
+    @property
+    def hits(self):
+        """Get hits"""
+        return self.__getitem__('counter')['hits']
+
+    @property
+    def delta(self):
+        """Get delta"""
+        return self.__getitem__('counter')['delta']
 
     def check_for_match(self, arg):
         """Checks for matches agasint Conditions in AccessList"""
         pass
 
-
 class AccessList(object):
     """a List like object for interacting with access lists
-
     Attributes:
         name (str): A string that functions as the name of the access lists.
             Used as the name when outputing named access-lists """
@@ -213,9 +429,16 @@ class AccessList(object):
     def __iter__(self):
         return iter(self.__entries)
 
+    # Not sure what this was here for
+    #def ismatch(self, match):
+    #    return self.condition == match
+
     def output(self):
         """Placeholder for output method"""
         pass
+
+    def create_entry(self, **kwargs):
+        self.append(Entry(**kwargs))
 
     def append(self, entry):
         """Appends Entry object to AccessList"""
@@ -234,10 +457,8 @@ class AccessList(object):
     def resequence(self, step=1):
         """Resequences line numbers of accesslist incrementing by step
         value
-
         Args:
             step (Optional[int]): the value to increment by. Defaults to 1
-
         Raises:
             ValueError: If step is less than or equal to zero
         """

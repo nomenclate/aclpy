@@ -239,7 +239,7 @@ class _Port(object):
 
     # TODO: This Needs to be cleaned up
     def contains(self, other):
-        for portobj in [ port for port in other ]:
+        for portobj in [port for port in other]:
             for otherport in portobj['port']:
                 for myport in self:
                     if myport['portop'] == 'eq':
@@ -344,21 +344,21 @@ class Entry(object):
                  counter=None):
 
         self.__data = {}
-        self.__data['name'] = name
+        self['name'] = name
         if index is None:
-            self.__data['index'] = index
+            self['index'] = index
         else:
-            self.__data['index'] = int(index)
+            self['index'] = int(index)
         self.__data['action'] = action
         if action is None:
-            self.__data['action'] = 'permit'
+            self['action'] = 'permit'
         else:
-            self.__data['action'] = action
-        self.__data['condition'] = Condition.condition(**condition)
+            self['action'] = action
+        self['condition'] = Condition.condition(**condition)
         if counter is None:
-            self.__data['counter'] = counter
+            self['counter'] = counter
         else:
-            self.__data['counter'] = counter
+            self['counter'] = counter
 
     def __getitem__(self, key):
         return self.__data[key]
@@ -403,7 +403,10 @@ class Entry(object):
     @property
     def delta(self):
         """Get delta"""
-        return self.__getitem__('counter')['delta']
+        if self['counter']:
+            return self['counter']['delta']
+        else:
+            return None
 
     def check_for_match(self, arg):
         """Checks for matches agasint Conditions in AccessList"""

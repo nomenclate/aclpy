@@ -369,7 +369,7 @@ class Entry(object):
         if key in Entry.validkeys and isinstance(value, Entry.validkeys[key]):
             self.__data[key] = value
         else:
-            raise ValueError('{} is wrong type')
+            raise TypeError('{} is wrong type')
 
     def __delitem__(self, key):
         del self.__data[key]
@@ -431,10 +431,6 @@ class Entry(object):
             return self['counter']['delta']
         else:
             return None
-
-    def check_for_match(self, arg):
-        """Checks for matches agasint Conditions in AccessList"""
-        pass
 
 class AccessList(object):
     """a List like object for interacting with access lists

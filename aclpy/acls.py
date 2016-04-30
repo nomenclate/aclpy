@@ -1,5 +1,3 @@
-"""Provides AccessList related objects"""
-
 from ipaddress import IPv4Network
 from collections import namedtuple
 

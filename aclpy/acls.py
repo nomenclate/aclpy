@@ -334,6 +334,12 @@ class Entry(object):
 
     # pylint: disable=too-many-arguments
     # I'm cool with this
+    validkeys = {'name':str,
+                 'index':int,
+                 'action':str,
+                 'condition':Condition,
+                 'counter':_counter}
+
     def __init__(self,
                  name=None,
                  index=None,
@@ -342,27 +348,26 @@ class Entry(object):
                  counter=None):
 
         self.__data = {}
-        self['name'] = name
-        if index is None:
-            self['index'] = index
-        else:
-            self['index'] = int(index)
-        self.__data['action'] = action
+        if name is not None:
+            self.name = name
+        if index is not None:
+            self.index = int(index)
         if action is None:
-            self['action'] = 'permit'
+            self.action = 'permit'
         else:
-            self['action'] = action
-        self['condition'] = Condition.condition(**condition)
-        if counter is None:
-            self['counter'] = counter
-        else:
-            self['counter'] = counter
+            self.action = action
+        self.condition = Condition.condition(**condition)
+        if counter is not None:
+            self['counter'] = _counter(counter['hits'], counter['delta'])
 
     def __getitem__(self, key):
         return self.__data[key]
 
     def __setitem__(self, key, value):
-        self.__data[key] = value
+        if key in Entry.validkeys and isinstance(value, Entry.validkeys[key]):
+            self.__data[key] = value
+        else:
+            raise ValueError('{} is wrong type')
 
     def __delitem__(self, key):
         del self.__data[key]
@@ -370,25 +375,44 @@ class Entry(object):
     def __iter__(self):
         return iter(self.__data)
 
+    def __repr__(self):
+        return repr(self.__data)
+
     @property
     def name(self):
         """Get name of Condition"""
         return self['name']
+
+    @name.setter
+    def name(self, value):
+        self['name'] = value
 
     @property
     def index(self):
         """Get index of Condition"""
         return self['index']
 
+    @index.setter
+    def index(self, value):
+        self['index'] = value
+
     @property
     def action(self):
         """Get action"""
         return self['action']
 
+    @action.setter
+    def action(self, value):
+        self['action'] = value
+
     @property
     def condition(self):
         """Get condition"""
         return self['condition']
+
+    @condition.setter
+    def condition(self, condition):
+        self['condition'] = condition
 
     @property
     def hits(self):

@@ -1,0 +1,40 @@
+from .context import aclpy
+import pytest
+from aclpy import acl, AccessList
+
+data = """IP Access List THIS_IS_A_NAME
+statistics per-entry
+10 permit udp any any eq 67 68 [match 10551, 0:11:57 ago]
+20 permit udp 10.10.28.0/23 host 10.10.200.11 eq domain [match 967497, 0:00:00 ago]
+30 permit udp 10.10.28.0/23 host 10.10.200.12 eq domain [match 560332, 0:00:59 ago]
+40 permit tcp 10.10.28.0/23 host 10.30.200.12 eq domain
+50 permit udp 10.10.28.0/23 host 10.48.0.9 eq 123 [match 73751, 0:00:00 ago]
+60 permit tcp 10.10.28.0/23 host 10.10.200.82 eq ftp [match 4, 48 days, 18:10:58 ago]
+70 permit tcp 10.10.28.0/23 gt 1023 host 10.10.200.82 eq ftp-data
+80 permit tcp 10.10.28.0/23 eq 2000 host 131.107.218.50 range 8000 8086
+85 permit tcp 10.10.28.0/23 range 2000 2001 host 131.107.218.50 range 8000 8086
+90 permit tcp 10.10.28.0/23 gt 1024 host 131.107.218.155 eq https
+95 permit tcp 10.10.28.0/23 neq 1024 host 131.107.218.155 eq https
+96 permit 1 host 10.10.0.1 any
+100 deny ip any any [match 151250, 0:08:53 ago]
+110 permit udp any gt 1024 any eq 67 68 [match 10551, 0:11:57 ago]"""
+
+def test_name():
+    result = acl.parseString(data)
+
+    parsedacl = AccessList(name=result['name'])
+
+    parsedacl = AccessList(name=result['name'])
+    for entry in result['entry']:
+        parsedacl.create_entry(index=entry['index'],
+                        action=entry['action'],
+                        condition=entry['condition'],
+                        counter=entry['counter'])
+
+    name = 'THIS_IS_A_NAME'
+
+    # Test results
+    assert parsedacl.name == name
+    assert result['name'] == name
+    assert parsedacl.name == result['name']
+    assert len(parsedacl) == len(data.splitlines())-2

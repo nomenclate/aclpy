@@ -1,13 +1,16 @@
 import pyparsing as pp
 
-def ports_to_dict(string, loc, tokens):
+# pylint: disable=invalid-name
+# pylint hates pyparsing
+
+def ports_to_dict(tokens):
     if len(tokens) == 0:
         return None
     else:
         return {'portop':tokens[0], 'port':tokens[1].asList()}
 
 def token_to_ip(iptype):
-    def parseAction(string, loc, tokens):
+    def parseAction(tokens):
         if iptype == 'any':
             return '0.0.0.0/0'
         elif iptype == 'host':
@@ -62,4 +65,4 @@ aclentry = (lineno('index') +
 acl = (name('name') + pp.LineEnd().suppress() +
        (pp.Literal('statistics per-entry') +
         pp.LineEnd()).suppress() +
-        pp.OneOrMore(aclentry))
+       pp.OneOrMore(aclentry))

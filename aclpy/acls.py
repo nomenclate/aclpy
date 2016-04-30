@@ -8,6 +8,8 @@ class _Protocol(object):
         if protocols is None:
             self._data = ['ip']
         else:
+            if not isinstance(protocols, list):
+                protocols = [protocols]
             self._data = [n for n in protocols]
 
     def __iter__(self):

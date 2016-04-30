@@ -3,11 +3,13 @@ import pyparsing as pp
 # pylint: disable=invalid-name
 # pylint hates pyparsing
 
-def ports_to_dict(tokens):
+
+def port_to_dict(tokens):
     if len(tokens) == 0:
         return None
     else:
-        return {'portop':tokens[0], 'port':tokens[1].asList()}
+        return {'portop': tokens[0], 'port': tokens[1].asList()}
+
 
 def token_to_ip(iptype):
     def parseAction(tokens):
@@ -52,9 +54,9 @@ counter = (lb +
 
 condition = (protocol('protocol') +
              (anyip ^ hostip ^ net)('srcip') +
-             (pp.Optional((srcport)))('srcport').setParseAction(ports_to_dict) +
+             (pp.Optional((srcport)))('srcport').setParseAction(port_to_dict) +
              (anyip ^ hostip ^ net)('dstip') +
-             (pp.Optional((dstports)))('dstport').setParseAction(ports_to_dict))
+             (pp.Optional((dstports)))('dstport').setParseAction(port_to_dict))
 
 aclentry = (lineno('index') +
             action('action') +

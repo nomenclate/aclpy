@@ -19,6 +19,10 @@ statistics per-entry
 100 deny ip any any [match 151250, 0:08:53 ago]
 110 permit udp any gt 1024 any eq 67 68 [match 10551, 0:11:57 ago]"""
 
+with open('.\\test\\aristaaclt.txt', 'r') as f:
+    pass
+
+
 def test_name():
     result = acl.parseString(data)
 
@@ -26,10 +30,10 @@ def test_name():
 
     parsedacl = AccessList(name=result['name'])
     for entry in result['entry']:
-        parsedacl.create_entry(index=entry['index'],
-                        action=entry['action'],
-                        condition=entry['condition'],
-                        counter=entry['counter'])
+        parsedacl.append_entry(index=entry['index'],
+                               action=entry['action'],
+                               condition=entry['condition'],
+                               counter=entry['counter'])
 
     name = 'THIS_IS_A_NAME'
 

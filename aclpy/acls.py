@@ -238,7 +238,8 @@ class _Port(object):
         else:
             return int(name)
 
-    # TODO: This Needs to be cleaned up
+    # TODO: This Needs to be cleaned up, _Port needs to be made simpler
+    # addtionally this logic will not work for entrywise comparisons
     def contains(self, other):
         for otherportobj in [entry for entry in other]:
             for otherport in otherportobj['port']:

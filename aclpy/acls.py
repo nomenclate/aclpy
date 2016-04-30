@@ -436,9 +436,11 @@ class AccessList(object):
     def __iter__(self):
         return iter(self.__entries)
 
-    # Not sure what this was here for
-    #def ismatch(self, match):
-    #    return self.condition == match
+    def ismatch(self, match):
+        for entry in self:
+            if entry.condition.contains(match):
+                return True
+        return False
 
     def output(self):
         """Placeholder for output method"""
@@ -472,8 +474,8 @@ class AccessList(object):
         if step <= 0:
             raise ValueError('step must be positive non zero value')
 
-        for entry, number in zip(self, range(step, len(self)*step+step, step)):
-            entry.line = number
+        for entry, newindex in zip(self, range(step, len(self)*step+step, step)):
+            entry.index = newindex
 
     @property
     def name(self):

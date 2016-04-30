@@ -240,8 +240,8 @@ class _Port(object):
 
     # TODO: This Needs to be cleaned up
     def contains(self, other):
-        for portobj in [port for port in other]:
-            for otherport in portobj['port']:
+        for otherportobj in [entry for entry in other]:
+            for otherport in otherportobj['port']:
                 for myportobj in self:
                     myport = myportobj['port']
                     myportop = myportobj['portop']
@@ -477,7 +477,7 @@ class AccessList(object):
         """Placeholder for output method"""
         pass
 
-    def create_entry(self, **kwargs):
+    def append_entry(self, **kwargs):
         self.append(Entry(**kwargs))
 
     def append(self, entry):
@@ -487,7 +487,7 @@ class AccessList(object):
         else:
             raise TypeError('{} is not a supported type'.format(type(entry)))
 
-    def insert(self, key, entry):
+    def insert_entry(self, key, entry):
         """Inserts an Entry object after the entry indicated by key"""
         if isinstance(entry, Entry):
             self.__entries.insert(self, key, entry)

@@ -359,6 +359,7 @@ class Condition(object):
         self.__data = {}
 
     def __setitem__(self, key, value):
+        # FIXME: this should raise an error if isinstance is False
         if key in Condition.validkeys and \
          isinstance(value, Condition.validkeys[key]):
             self.__data[key] = value
@@ -415,7 +416,7 @@ class Entry(object):
             self['counter'] = _counter(counter['hits'], counter['delta'])
 
     def __getitem__(self, key):
-        if self.__data[key]:
+        if key in self.__data.keys():
             return self.__data[key]
 
     def __setitem__(self, key, value):
@@ -473,7 +474,7 @@ class Entry(object):
     def hits(self):
         """Get hits"""
         if self['counter']:
-            return self['counter']['hits']
+            return self['counter'].hits
         else:
             return None
 
@@ -481,7 +482,7 @@ class Entry(object):
     def delta(self):
         """Get delta"""
         if self['counter']:
-            return self['counter']['delta']
+            return self['counter'].delta
         else:
             return None
 

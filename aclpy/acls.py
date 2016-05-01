@@ -19,20 +19,22 @@ def _build_output(index,
     output = '{} {} {} {} '.format(index, action, protocol, srcip)
     if srcport:
         output += '{} {} '.format(srcport.portop,
-                                  ' '.join(map(str, srcport.port)))
+                                  ' '.join([str(p) for p in srcport.port]))
 
     output += '{} '.format(dstip)
 
     if dstport:
         output += '{} {} '.format(dstport.portop,
-                                  ' '.join(map(str, dstport.port)))
+                                  ' '.join([str(p) for p in srcport.port]))
 
     return output
 
 
 def arista_output(accesslist):
     # I have studied the sacred texts from the merciless Trigger Dojo
-    output = []
+    # TODO: this should be refactored, it's a bit of a mess and
+    # doesn't take ICMP in to account.
+    output = ['ip access-list {}'.format(accesslist.name)]
     for entry in accesslist:
         for protocol in entry.condition['protocol']:
             for srcip in entry.condition['srcip']:
@@ -44,7 +46,7 @@ def arista_output(accesslist):
                                                         protocol,
                                                         srcip, srcport,
                                                         dstip, dstport))
-    return(output)
+    return output
 
 
 class _Protocol(object):

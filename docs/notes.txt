@@ -1,3 +1,4 @@
+# flake8: noqa
 if protocol in ('ip', 'ospf')
   no ports
 elsif protocol in ('tcp','udp')
@@ -36,6 +37,5 @@ srcport  = [{'portop':'gt', 'port':['1023']}]
 dstip = [IPv4Network('10.1.0.0/23')]
 dstport  = [{'portop':'lt', 'port':['www']}]
 
-[{'port': ['bootps', 'bootpc'], 'portop': 'eq'},{'port': ['bootps', 'bootpc'], 'portop': 'eq'}]
-
-code = []
+# TODO: Make a container class called Ports and a class for individual ports.
+# The current _Ports seems to be doing both and this may be part of the mess

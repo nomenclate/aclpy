@@ -1,3 +1,4 @@
+# flake8: noqa
 from .context import aclpy
 import pytest
 from aclpy import acl, AccessList
@@ -18,9 +19,6 @@ statistics per-entry
 96 permit 1 host 10.10.0.1 any
 100 deny ip any any [match 151250, 0:08:53 ago]
 110 permit udp any gt 1024 any eq 67 68 [match 10551, 0:11:57 ago]"""
-
-with open('.\\test\\aristaaclt.txt', 'r') as f:
-    pass
 
 
 def test_name():

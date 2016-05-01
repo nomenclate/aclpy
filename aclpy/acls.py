@@ -31,7 +31,7 @@ def _build_output(index,
 
 
 def arista_output(accesslist):
-    # I have studied the scared texts from the merciless Trigger Dojo
+    # I have studied the sacred texts from the merciless Trigger Dojo
     output = []
     for entry in accesslist:
         for protocol in entry.condition['protocol']:

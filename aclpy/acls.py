@@ -2,6 +2,49 @@ from ipaddress import IPv4Network
 from collections import namedtuple
 
 _counter = namedtuple('counter', ['hits', 'delta'])
+_port = namedtuple('port', ['portop', 'port'])
+
+
+def _check(portobj):
+    if portobj is None:
+        portobj = [None]
+    return portobj
+
+
+def _build_output(index,
+                  action, protocol,
+                  srcip, srcport,
+                  dstip, dstport):
+
+    output = '{} {} {} {} '.format(index, action, protocol, srcip)
+    if srcport:
+        output += '{} {} '.format(srcport.portop,
+                                  ' '.join(map(str, srcport.port)))
+
+    output += '{} '.format(dstip)
+
+    if dstport:
+        output += '{} {} '.format(dstport.portop,
+                                  ' '.join(map(str, dstport.port)))
+
+    return output
+
+
+def arista_output(accesslist):
+    # I have studied the scared texts from the merciless Trigger Dojo
+    output = []
+    for entry in accesslist:
+        for protocol in entry.condition['protocol']:
+            for srcip in entry.condition['srcip']:
+                for srcport in _check(entry.condition['srcport']):
+                    for dstip in entry.condition['dstip']:
+                        for dstport in _check(entry.condition['dstport']):
+                            output.append(_build_output(entry.index,
+                                                        entry.action,
+                                                        protocol,
+                                                        srcip, srcport,
+                                                        dstip, dstport))
+    return(output)
 
 
 class _Protocol(object):
@@ -28,6 +71,7 @@ class _Protocol(object):
 
 
 class _Port(object):
+    # These are all Arista specific port names
     portnames = {
         # TCP ports start here
         'acap': 674,  # Application Configuration Access Protocol
@@ -222,7 +266,9 @@ class _Port(object):
         else:
             self._data = []
             for port in ports:
-                port['port'] = [_Port.name_to_port(n) for n in port['port']]
+                port = _port(port['portop'],
+                             [_Port.name_to_port(n) for n in port['port']])
+                # FIXME: name to port lookup should happen in parser
                 self._data.append(port)
 
     def __iter__(self):
@@ -242,10 +288,10 @@ class _Port(object):
     # addtionally this logic will not work for entrywise comparisons
     def contains(self, other):
         for otherportobj in [entry for entry in other]:
-            for otherport in otherportobj['port']:
+            for otherport in otherportobj.port:
                 for myportobj in self:
-                    myport = myportobj['port']
-                    myportop = myportobj['portop']
+                    myport = myportobj.port
+                    myportop = myportobj.portop
                     if myportop == 'eq':
                         return any([otherport == n for n in myport])
                     elif myportop == 'range':
@@ -298,23 +344,23 @@ class _Address(object):
 
 class Condition(object):
     """Container class for condition objects"""
-    conditions = {'protocol': _Protocol,
-                  'srcip': _Address,
-                  'dstip': _Address,
-                  'srcport': _Port,
-                  'dstport': _Port}
+    validkeys = {'protocol': _Protocol,
+                 'srcip': _Address,
+                 'dstip': _Address,
+                 'srcport': _Port,
+                 'dstport': _Port}
 
     def __init__(self):
         self.__data = {}
 
     def __setitem__(self, key, value):
-        self.__data[key] = value
+        if key in Condition.validkeys and \
+         isinstance(value, Condition.validkeys[key]):
+            self.__data[key] = value
 
     def __getitem__(self, key):
-        return self.__data[key]
-
-    def __delitem__(self, key):
-        del self.__data[key]
+        if key in self.__data.keys():
+            return self.__data[key]
 
     def __iter__(self):
         return iter(self.__data.items())
@@ -323,16 +369,16 @@ class Condition(object):
         return repr(self.__data)
 
     def contains(self, other):
-        return all([self[k].contains(other[k]) for k, v in self])
+        return all([self[key].contains(other[key]) for key, __ in self])
 
     @classmethod
     def condition(cls, **kwargs):
         condition = Condition()
         for key, value in kwargs.items():
-            if key in cls.conditions.keys():
+            if key in cls.validkeys.keys():
                 if not isinstance(value, list):
                     value = [value]
-                condition[key] = cls.conditions[key](value)
+                condition[key] = cls.validkeys[key](value)
         return condition
 
 
@@ -368,7 +414,8 @@ class Entry(object):
             self['counter'] = _counter(counter['hits'], counter['delta'])
 
     def __getitem__(self, key):
-        return self.__data[key]
+        if self.__data[key]:
+            return self.__data[key]
 
     def __setitem__(self, key, value):
         if key in Entry.validkeys and isinstance(value, Entry.validkeys[key]):

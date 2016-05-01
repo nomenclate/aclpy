@@ -1,8 +1,25 @@
 from ipaddress import IPv4Network
 from collections import namedtuple
+from aclpy.aclparse import acl
+
 
 _counter = namedtuple('counter', ['hits', 'delta'])
 _port = namedtuple('port', ['portop', 'port'])
+
+
+def file_to_acl(filename):
+    with open(filename, 'r') as f:
+        data = f.read()
+
+    parseresult = acl.parseString(data)
+    parsedacl = AccessList(name=parseresult['name'])
+
+    for entry in parseresult['entry']:
+        parsedacl.append_entry(index=entry['index'],
+                               action=entry['action'],
+                               condition=entry['condition'],
+                               counter=entry['counter'])
+    return parsedacl
 
 
 def _check(portobj):
@@ -75,6 +92,7 @@ class _Protocol(object):
 
 
 class _Port(object):
+    """Ports class"""
     # These are all Arista specific port names
     portnames = {
         # TCP ports start here

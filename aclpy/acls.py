@@ -6,16 +6,15 @@ _port = namedtuple('port', ['portop', 'port'])
 
 
 def _check(portobj):
+    """Helper function used by aristaouput, handles converts missing portobj
+        to iterable Nones"""
     if portobj is None:
         portobj = [None]
     return portobj
 
 
-def _build_output(index,
-                  action, protocol,
-                  srcip, srcport,
-                  dstip, dstport):
-
+def _build_output(index, action, protocol, srcip, srcport, dstip, dstport):
+    """helper function used by arista output to format the strings"""
     output = '{} {} {} {} '.format(index, action, protocol, srcip)
     if srcport:
         output += '{} {} '.format(srcport.portop,
@@ -25,12 +24,15 @@ def _build_output(index,
 
     if dstport:
         output += '{} {} '.format(dstport.portop,
-                                  ' '.join([str(p) for p in srcport.port]))
+                                  ' '.join([str(p) for p in dstport.port]))
 
     return output
 
 
 def arista_output(accesslist):
+    """Helper function to generate accesslist ouput appropriate for an
+        Arista switch/router.  This will eventually get rolled up into
+        a output module or class."""
     # I have studied the sacred texts from the merciless Trigger Dojo
     # TODO: this should be refactored, it's a bit of a mess and
     # doesn't take ICMP in to account.
@@ -325,7 +327,8 @@ class _Address(object):
 
         Args:
             ipaddress(str): an IP address as a string either as a host
-            address (i.e. 10.0.0.0) or as a CIDR network (i.e. 10.0.0.0/8)
+                            address or as a CIDR Network.  Host address
+                            will be converted to a /32
 
         Returns:
             IPv4Network(object)"""
@@ -395,11 +398,7 @@ class Entry(object):
                  'condition': Condition,
                  'counter': _counter}
 
-    def __init__(self,
-                 name=None,
-                 index=None,
-                 action=None,
-                 condition=None,
+    def __init__(self, name=None, index=None, action=None, condition=None,
                  counter=None):
 
         self.__data = {}

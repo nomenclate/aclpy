@@ -1,0 +1,41 @@
+# flake8: noqa
+if protocol in ('ip', 'ospf')
+  no ports
+elsif protocol in ('tcp','udp')
+  get the ports
+elsif protocol == icmp
+  do codes
+elsif:
+  raise NotImplementedError
+
+
+If conditions['prot'].match(match.prot) &
+   conditions['srcip'].match(match.srcip) &
+   conditions['srcport'].match(match.srcport) &
+   conditions['dstip'].match(match.dstip) &
+   conditions['dstport'].match(match.dstport):
+
+
+For condition in conditions:
+    condition.match(match
+
+
+
+prot srcip dstip  |
+prot srcip dstip  |srcport dstport
+prot srcip dstip  |code
+
+
+iptuple
+porttuple
+
+
+
+prot = ['tcp']
+srcip = [IPv4Network('10.0.0.0/23'),]
+srcport  = [{'portop':'gt', 'port':['1023']}]
+dstip = [IPv4Network('10.1.0.0/23')]
+dstport  = [{'portop':'lt', 'port':['www']}]
+
+# TODO: Make a container class called Ports and a class for individual ports.
+# The current _Ports seems to be doing both and this may be part of the mess

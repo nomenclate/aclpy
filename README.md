@@ -1,5 +1,5 @@
 # ACLpy
-Basic ACL parser that I wrote while learning python. It was a learning project inspired in part by trigger, it is functional but unfinished.
+Basic ACL parser that I wrote while learning python. It was a learning project inspired in part by [trigger](https://github.com/trigger/trigger), it is functional but unfinished.
 
 The idea was to create a parser using pyparsing that would parse ACLS from assorted vendors and store the parsed data into a vendor agnostic format.
 
